@@ -39,4 +39,5 @@ pkg
 #.\#*
 #
 # For vim:
-#*.swp
+*.swp
+Gemfile.lock
