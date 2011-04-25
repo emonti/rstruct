@@ -2,14 +2,6 @@ require 'rstruct/registry'
 
 module Rstruct
   class Type
-    attr_reader :name, :size, :format
-
-    def initialize(name, size, format)
-      @name = name.to_sym
-      @size = size
-      @format = format
-    end
-
     module ClassMethods
       def instance(*args)
         new(*args)
@@ -31,6 +23,15 @@ module Rstruct
     def self.inherited(base)
       base.extend(ClassMethods)
     end
+
+    attr_reader :name, :size, :format
+
+    def initialize(name, size, format)
+      @name = name.to_sym
+      @size = size
+      @format = format
+    end
+
   end
 
 end
