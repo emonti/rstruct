@@ -1,16 +1,39 @@
 = rstruct
 
-Description goes here.
+Rstruct is yet another ruby binary struct parser/builder framework based around
+a declarative syntax. Rstruct is designed with simplicity in mind with a slight
+focus on performance. 
 
-== Contributing to rstruct
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
-* Fork the project
-* Start a feature/bugfix branch
-* Commit and push until you are happy with your contribution
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+The structure declaration syntax emulates C structures syntax, although Rstruct
+is not intended to be able to parse C structures from C header files. (howewver
+an addon could conceivably be built to do so with minimal fuss)
+
+There are several other binary structure library options out there such as
+BinData, BitStruct, or Ruckus.
+
+Rstruct was written because the authors wanted something comparable to C
+structures without having a strong need for extra 'magic' in parsing or
+building structures. While there exist numerous options in this space, they
+all seem to have suffered from a combination of performance and interface issues
+which limit their potential (and in some cases, spotty maintenance). 
+
+The design of Rstruct is loosely based on the python library Construct.
+Notions of structure definition, parsing, and building are all kept seperate
+from eachother in order to keep the interface simplified. 
+
+Furthermore, multiple approaches to parsing and building are supported and
+more can be added with minimal fuss. For example, you might not wish to use
+the same interface to build or parse a structure on an IO object as you would
+a String object. In other words, it's nice to have something that can work
+easily with streamed IO as well as buffers.
+
+Rstruct is designed to allow you more than one option when dealing with input
+and output of structures so as not to force your code into awkward convolutions
+to get things working. 
+
+The goal is to have a system that lets you define structures once, and use them
+in many ways as you see fit. Kinda like... C structs in system/API header files.
+
 
 == Copyright
 
