@@ -10,9 +10,16 @@ describe Rstruct do
     Rstruct.should respond_to(:struct)
   end
 
-  it "should let others have a struct method with the ClassMethods mixin" do
+  it "should supply a helper to access the default registry" do
+    Rstruct.should respond_to(:default_registry)
+    Rstruct.default_registry.should == Rstruct::Registry::DEFAULT_REGISTRY
+  end
+
+  it "should let others import methods with the ClassMethods mixin" do
     c=Class.new(Object){ extend(Rstruct::ClassMethods) }
     c.should respond_to(:struct)
+    c.should respond_to(:default_registry)
+    c.default_registry.should == Rstruct::Registry::DEFAULT_REGISTRY
   end
 
   context "The struct method" do
@@ -29,10 +36,12 @@ describe Rstruct do
         someint1 :int32
         someint2 :int32
       }
-      s.fields.should be_an(Array)
-      s.field_names.should == [:someint1, :someint2]
+      s.should be_a(Rstruct::Structure)
       s.size.should == 8
       s.format.should == "ll"
+      s.fields.should be_an(Array)
+      s.field_names.should == [:someint1, :someint2]
+      s.fields.each{|f| f.should be_kind_of(Rstruct::Int32) }
     end
 
     it "should not register a structure by default" do
@@ -40,14 +49,14 @@ describe Rstruct do
       Rstruct.default_registry.get(:rspec_not_reg_dflt).should be_nil
     end
 
-    it "should allow a struct to register with in the default registry" do
+    it "should allow a struct to register itself with the default registry" do
       (s=Rstruct.struct(:rspec_registered, :register=>true){}).should be_a(Rstruct::Structure)
       Rstruct.default_registry.get(:rspec_registered).should == s
     end
 
     it "should allow a struct to explicitely opt out of registration" do
       (s=Rstruct.struct(:rspec_not_reg, :register => false){}).should be_a(Rstruct::Structure)
-      Rstruct.default_registry.get(:not_registered).should be_nil
+      Rstruct.default_registry.get(:rspec_not_reg).should be_nil
     end
 
   end
