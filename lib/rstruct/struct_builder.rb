@@ -26,5 +26,15 @@ module Rstruct
     end
 
   end
+
+  class CstructBuilder < StructBuilder
+    def method_missing(typ_arg, name, *args, &block)
+      if typ = @__registry.get(typ_arg)
+        __field(typ, name, *args, &block)
+      else
+        raise StructError, "invalid field type #{typ_arg}"
+      end
+    end
+  end
 end
 
