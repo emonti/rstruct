@@ -39,7 +39,7 @@ module Rstruct
 
   class Short < Type
     register
-    SIZE = [0].pack("s_")
+    SIZE = [0].pack("s_").size
     def initialize(name, opts={})
       super(name, SIZE, "s_")
     end
@@ -47,7 +47,7 @@ module Rstruct
 
   class Ushort < Type
     register
-    SIZE = [0].pack("S_")
+    SIZE = [0].pack("S_").size
     def initialize(name, opts={})
       super(name, SIZE, "S_")
     end
@@ -55,7 +55,7 @@ module Rstruct
 
   class Long < Type
     register
-    SIZE = [0].pack("l_")
+    SIZE = [0].pack("l_").size
     def initialize(name, opts={})
       super(name, SIZE, "l_")
     end
@@ -63,7 +63,7 @@ module Rstruct
 
   class Ulong < Type
     register
-    SIZE = [0].pack("L_")
+    SIZE = [0].pack("L_").size
     def initialize(name, opts={})
       super(name, SIZE, "L_")
     end
@@ -108,6 +108,34 @@ module Rstruct
     register
     def initialize(name, opts={})
       super(name, 8, "Q")
+    end
+  end
+
+  class Uint16le < Type
+    register
+    def initialize(name, opts={})
+      super(name, 8, "v")
+    end
+  end
+
+  class Uint16be < Type
+    register
+    def initialize(name, opts={})
+      super(name, 8, "n")
+    end
+  end
+
+  class Uint32le < Type
+    register
+    def initialize(name, opts={})
+      super(name, 8, "V")
+    end
+  end
+
+  class Uint32be < Type
+    register
+    def initialize(name, opts={})
+      super(name, 8, "N")
     end
   end
 
