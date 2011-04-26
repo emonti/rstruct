@@ -33,8 +33,8 @@ describe Rstruct do
 
     it "should allow structure fields to be defined" do
       s = Rstruct.struct(:rspec_struct_test) {
-        someint1 :int32
-        someint2 :int32
+        int32   :someint1
+        int32   :someint2
       }
       s.should be_a(Rstruct::Structure)
       s.size.should == 8

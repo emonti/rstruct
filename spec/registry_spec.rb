@@ -11,7 +11,6 @@ describe Rstruct::Registry do
 
   context "default registry" do
     it "should have several basic types already registered" do
-#      @dflt_reg.get(:struct).should be_a(Rstruct::Type)
       @dflt_reg.get(:byte).should == Rstruct::Byte
       @dflt_reg.get(:char).should == Rstruct::Char
       @dflt_reg.get(:int).should  == Rstruct::Int
@@ -20,6 +19,7 @@ describe Rstruct::Registry do
       @dflt_reg.get(:uint).should  == Rstruct::Uint
       @dflt_reg.get(:ushort).should == Rstruct::Ushort
       @dflt_reg.get(:ulong).should == Rstruct::Ulong
+      @dflt_reg.get(:struct).should == Rstruct::Structure
     end
   end
 end

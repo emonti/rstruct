@@ -139,4 +139,12 @@ module Rstruct
     end
   end
 
+  class Pointer < Type
+    register
+    SIZE = [0].pack("L_").size
+
+    def initialize(name, typ, opts={})
+      super(name, SIZE, "L_")
+    end
+  end
 end

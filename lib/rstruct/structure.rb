@@ -4,12 +4,12 @@ require 'rstruct/registry'
 
 module Rstruct
   class Structure < Type
-    register
+    register :struct
 
     attr_reader :fields
 
     def initialize(name, opts={}, &block)
-      builder = opts[:builder] ||StructBuilder
+      builder = opts[:builder] || StructBuilder
 
       if reg=opts[:register]
         reg=Registry::DEFAULT_REGISTRY if reg==true
@@ -28,6 +28,5 @@ module Rstruct
     def field_names
       @fields.map{|f| f.name}
     end
-
   end
 end

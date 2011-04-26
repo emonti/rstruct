@@ -18,6 +18,20 @@ module Rstruct
         reg ||= Registry::DEFAULT_REGISTRY
         reg.register(self, *names)
       end
+
+      # we're gonna hijack the * operator here
+      # to act like a pointer. Live with it.
+      def *(name, *args, &block)
+        Pointer.new(name, self, *args, &block)
+      end
+
+      # we're gonna hijack the [] operator here
+      # to approximate acting like an array.
+      # Live with it.
+      def [](name, count, &block)
+        Array.new(name, self, count, &block)
+      end
+
     end
 
     def self.inherited(base)

@@ -13,28 +13,26 @@ module Rstruct
       instance_eval &block
     end
 
-    def method_missing(name, typ_arg, *args, &block)
-      if typ = @__registry.get(typ_arg)
-        __field(typ, name, *args, &block)
-      else
+    def method_missing(typ_arg, *args, &block)
+      name = args.shift
+      unless typ = @__registry.get(typ_arg)
         raise StructError, "invalid field type #{typ_arg}"
+      end
+
+      # We accept what look like object references to
+      # types. This allows us to handle pointers and arrays
+      # in a declarative manner similar to C structs.
+      if name.nil? and args.empty?
+        return typ
+      else
+        __field(typ, name, *args, &block)
       end
     end
 
     def __field(typ, name, *args, &block)
       @__fields << typ.instance(name, *args, &block)
     end
-
   end
 
-  class CstructBuilder < StructBuilder
-    def method_missing(typ_arg, name, *args, &block)
-      if typ = @__registry.get(typ_arg)
-        __field(typ, name, *args, &block)
-      else
-        raise StructError, "invalid field type #{typ_arg}"
-      end
-    end
-  end
 end
 
