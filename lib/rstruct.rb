@@ -19,7 +19,7 @@ module Rstruct
     # The DSL interface for this method is implemented by
     # Rstruct::CstructBuilder.
     def cstruct(name, opts={}, &block)
-      Rstruct::Structure.new(name,opts.merge(:builder => CstructBuilder, &block)
+      Rstruct::Structure.new(name,opts.merge(:builder => CstructBuilder, &block))
     end
 
     # Returns the default Rstruct registry
