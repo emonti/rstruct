@@ -9,12 +9,14 @@ module Rstruct
     attr_reader :fields
 
     def initialize(name, opts={}, &block)
+      builder = opts[:builder] ||StructBuilder
+
       if reg=opts[:register]
         reg=Registry::DEFAULT_REGISTRY if reg==true
         reg.register(self, name.to_sym)
       end
 
-      @fields = StructBuilder.new(reg, &block).__fields
+      @fields = builder.new(reg, &block).__fields
       size = @fields.inject(0){|s,v| s+=v.size}
       super(name, size, nil)
     end
