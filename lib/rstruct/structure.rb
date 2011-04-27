@@ -17,16 +17,23 @@ module Rstruct
       end
 
       @fields = builder.new(reg, &block).__fields
-      size = @fields.inject(0){|s,v| s+=v.size}
-      super(name, size, nil)
+      super(name)
     end
 
     def format
       @fields.map{|f| f.format }.join
     end
 
+    def size
+      @fields.inject(0){|s,v| s+=v.size}
+    end
+
     def field_names
       @fields.map{|f| f.name}
+    end
+
+    def value
+      @fields.map{|f| f.value}
     end
   end
 end

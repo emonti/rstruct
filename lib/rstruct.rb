@@ -9,7 +9,6 @@ module Rstruct
 
     # Take the following C struct for example:
     #
-    #
     #   struct mach_header {
     #     uint32_t      magic;      /* mach magic number identifier */
     #     cpu_type_t    cputype;    /* cpu specifier */
@@ -22,20 +21,30 @@ module Rstruct
     #
     # Which might be defined with rstruct as follows:
     #
+    #   extend(Rstruct::ClassMethods)
+    #
+    #   typedef :uint32_t, :cpu_type_t
+    #   typedef :uint32_t, :cpu_subtype_t
+    #
     #   struct(:mach_header) {
-    #     uint32_t  magic;      # mach magic number identifier
-    #     uint32_t  cputype;    # cpu specifier
-    #     uint32_t  cpusubtype; # machine specifier
-    #     uint32_t  filetype;   # type of file
-    #     uint32_t  ncmds;      # number of load commands
-    #     uint32_t  sizeofcmds; # the size of all the load commands
-    #     uint32_t  flags;      # flags
+    #     uint32_t      :magic      # mach magic number identifier
+    #     cpu_type_t    :cputype    # cpu specifier
+    #     cpu_subtype_t :cpusubtype # machine specifier
+    #     uint32_t      :filetype   # type of file
+    #     uint32_t      :ncmds      # number of load commands
+    #     uint32_t      :sizeofcmds # the size of all the load commands
+    #     uint32_t      :flags      # flags
     #   }
     #
     # The DSL interface for this method is implemented by
     # Rstruct::StructBuilder.
     def struct(name, opts={},&block)
       Rstruct::Structure.new(name, opts, &block)
+    end
+
+    def typedef(p, t, opts={})
+      reg = opts[:registry] || default_registry
+      reg.typedef(p,t,opts)
     end
 
     # Returns the default Rstruct registry

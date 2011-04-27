@@ -1,8 +1,6 @@
 require 'rstruct/registry'
 
 module Rstruct
-  class StructError < StandardError
-  end
 
   class StructBuilder
     attr_reader :__fields, :__registry
@@ -16,7 +14,7 @@ module Rstruct
     def method_missing(typ_arg, *args, &block)
       name = args.shift
       unless typ = @__registry.get(typ_arg)
-        raise StructError, "invalid field type #{typ_arg}"
+        raise TypeNotFoundError, "invalid field type #{typ_arg}"
       end
 
       # We accept what look like object references to
