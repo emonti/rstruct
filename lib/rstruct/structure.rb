@@ -12,12 +12,14 @@ module Rstruct
       builder = opts[:builder] || StructBuilder
 
       if reg=opts[:register]
-        reg=Registry::DEFAULT_REGISTRY if reg==true
+        reg=Registry::DEFAULT_REGISTRY if reg==true # true is shorthand for default
         reg.register(self, name.to_sym)
       end
 
+      lkupreg = (opts[:fields_from])
+
       super(name, opts) {} # need a block here since we're claiming the caller's
-      @fields = builder.new(reg, &block).__fields
+      @fields = builder.new((lkupreg || reg), &block).__fields
     end
 
     def format

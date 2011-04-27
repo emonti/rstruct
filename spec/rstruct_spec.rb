@@ -103,6 +103,35 @@ describe Rstruct do
 
     end
 
+    it "should allow fields to come an alternate registry without registration of the struct" do
+      # create a registry for this test
+      reg = $rstruct_klass_reg_test_reg2 = Rstruct::Registry.new(:rstruct_klass_test_reg3)
+
+      # create a test type registered to this registry
+      c = Class.new(Rstruct::Type)
+      c.register :reg_test_typ2, $rstruct_klass_reg_test_reg2
+      reg[:reg_test_typ2].should == c
+
+      # create a struct which registers itself to this registry
+      # and declares a field of the above type
+      s = Rstruct.struct(:rstruct_klass_test_struct2, :fields_from => reg) {
+        int32   :someint1
+        int32   :someint2
+        reg_test_typ2 :sometype
+      }
+
+      # confirm the struct is not registered
+      reg[:rstruct_klass_test_struct2].should be_nil
+      Rstruct.default_registry[:rstruct_klass_test_struct2].should be_nil
+
+      # confirm declaration went ok
+      s.fields.should be_an(Array)
+      s.field_names.should == [:someint1, :someint2, :sometype]
+      s.fields[0,2].each{|f| f.should be_kind_of(Rstruct::Int32) }
+      s.fields.last.should be_kind_of(c)
+
+    end
+
     it "should not register a structure by default" do
       (s=Rstruct.struct(:rspec_not_reg_dflt){}).should be_a(Rstruct::Structure)
       Rstruct.default_registry.get(:rspec_not_reg_dflt).should be_nil
