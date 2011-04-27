@@ -34,15 +34,20 @@ describe Rstruct::Registry do
     end
 
     it "should inherit types from arbitrary registries" do
-      @registry.inherits.unshift(@preg)
-      c=Class.new(Rstruct::Type)
-      @preg.register(c, :some_parent_reg_type)
-      @preg[:some_parent_reg_type].should == c
-      @registry[:some_parent_reg_type].should == c
-      Rstruct.default_registry[c].should be_nil
+      begin
+        @registry.inherits.unshift(@preg)
+        c=Class.new(Rstruct::Type)
+        @preg.register(c, :some_parent_reg_type)
+        @preg[:some_parent_reg_type].should == c
+        @registry[:some_parent_reg_type].should == c
+        Rstruct.default_registry[c].should be_nil
+      ensure
+        @registry.inherits.delete(@preg)
+      end
+        
     end
 
-    it "should register types only its own registry" do
+    it "should register types only to its own registry" do
       typ = :"test_parent_reg_#{@registry.name}_1"
       obj=Class.new(Rstruct::Type)
 
