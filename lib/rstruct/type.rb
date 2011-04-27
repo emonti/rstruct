@@ -29,7 +29,7 @@ module Rstruct
       # to approximate acting like an array.
       # Live with it.
       def [](name, count, &block)
-        Array.new(name, self, count, &block)
+        List.new(name, self, count, &block)
       end
 
     end

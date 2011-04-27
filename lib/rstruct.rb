@@ -9,34 +9,27 @@ module Rstruct
 
     # Take the following C struct for example:
     #
-    # Which can be defined with rstruct as follows:
     #
-    #   struct tm {
-    #     int   tm_sec;      /* seconds after the minute [0-60] */
-    #     int   tm_min;      /* minutes after the hour [0-59] */
-    #     int   tm_hour;     /* hours since midnight [0-23] */
-    #     int   tm_mday;     /* day of the month [1-31] */
-    #     int   tm_mon;      /* months since January [0-11] */
-    #     int   tm_year;     /* years since 1900 */
-    #     int   tm_wday;     /* days since Sunday [0-6] */
-    #     int   tm_yday;     /* days since January 1 [0-365] */
-    #     int   tm_isdst;    /* Daylight Savings Time flag */
-    #     long  tm_gmtoff;   /* offset from CUT in seconds */
-    #     char  *tm_zone;    /* timezone abbreviation */
-    #   };
+    #   struct mach_header {
+    #     uint32_t      magic;      /* mach magic number identifier */
+    #     cpu_type_t    cputype;    /* cpu specifier */
+    #     cpu_subtype_t cpusubtype; /* machine specifier */
+    #     uint32_t      filetype;   /* type of file */
+    #     uint32_t      ncmds;      /* number of load commands */
+    #     uint32_t      sizeofcmds; /* the size of all the load commands */
+    #     uint32_t      flags;      /* flags */
+    #   }
     #
-    #   Rstruct.struct(:tm) {
-    #     int   :tm_sec       # seconds after the minute [0-60] */
-    #     int   :tm_min       # minutes after the hour [0-59] */
-    #     int   :tm_hour      # hours since midnight [0-23] */
-    #     int   :tm_mday      # day of the month [1-31] */
-    #     int   :tm_mon       # months since January [0-11] */
-    #     int   :tm_year      # years since 1900 */
-    #     int   :tm_wday      # days since Sunday [0-6] */
-    #     int   :tm_yday      # days since January 1 [0-365] */
-    #     int   :tm_isdst     # Daylight Savings Time flag */
-    #     long  :tm_gmtoff    # offset from CUT in seconds */
-    #     char  *:tm_zone     # timezone abbreviation */
+    # Which might be defined with rstruct as follows:
+    #
+    #   struct(:mach_header) {
+    #     uint32_t  magic;      # mach magic number identifier
+    #     uint32_t  cputype;    # cpu specifier
+    #     uint32_t  cpusubtype; # machine specifier
+    #     uint32_t  filetype;   # type of file
+    #     uint32_t  ncmds;      # number of load commands
+    #     uint32_t  sizeofcmds; # the size of all the load commands
+    #     uint32_t  flags;      # flags
     #   }
     #
     # The DSL interface for this method is implemented by
