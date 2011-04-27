@@ -24,97 +24,129 @@ describe Rstruct::Structure do
       s.fields.each{|f| f.should be_kind_of(Rstruct::Int32) }
     end
 
-    it "should allow a structure to register itself in a registry and still access default types" do
-      # create a registry for this test
-      reg = Rstruct::Registry.new(:rstruct_klass_test_reg1)
+    context 'registration' do
+      it "should not register a structure by default" do
+        (s=Rstruct::Structure.new(:rstruct_klass_not_reg_dflt){}).should be_a(Rstruct::Structure)
+        Rstruct.default_registry.get(:rstruct_klass_not_reg_dflt).should be_nil
+      end
 
-      # create a struct which registers itself to this registry
-      s = Rstruct::Structure.new(:rstruct_klass_test_struct1, :register => reg) {
-        int32   :someint1
-        int32   :someint2
-      }
+      it "should allow a struct to explicitely opt out of registration" do
+        (s=Rstruct::Structure.new(:rstruct_klass_not_reg, :register=>false){}).should be_a(Rstruct::Structure)
+        Rstruct.default_registry.get(:rstruct_klass_not_reg).should be_nil
+      end
 
-      # confirm declaration went ok
-      s.fields.should be_an(Array)
-      s.field_names.should == [:someint1, :someint2]
-      s.fields.each{|f| f.should be_kind_of(Rstruct::Int32) }
+      it "should allow a struct to register itself with the default registry" do
+        (s=Rstruct::Structure.new(:rstruct_klass_registered, :register=>true){}).should be_a(Rstruct::Structure)
+        Rstruct.default_registry.get(:rstruct_klass_registered).should == s
+      end
 
-      # confirm the struct is registered
-      reg[:rstruct_klass_test_struct1].should == s
-    end
+      it "should allow a structure to register itself in a registry and still access default types" do
+        # create a registry for this test
+        reg = Rstruct::Registry.new(:rstruct_klass_test_reg1)
 
-    it "should allow structure fields to come from the registry the struct is registered to" do
-      # create a registry for this test
-      reg = $rstruct_klass_reg_test_reg = Rstruct::Registry.new(:rstruct_klass_test_reg2)
+        # create a struct which registers itself to this registry
+        s = Rstruct::Structure.new(:rstruct_klass_test_struct1, :register => reg) {
+          int32   :someint1
+          int32   :someint2
+        }
 
-      # create a test type registered to this registry
-      c = Class.new(Rstruct::Type)
-      c.register :reg_test_typ, $rstruct_klass_reg_test_reg
-      reg[:reg_test_typ].should == c
+        # confirm declaration went ok
+        s.fields.should be_an(Array)
+        s.field_names.should == [:someint1, :someint2]
+        s.fields.each{|f| f.should be_kind_of(Rstruct::Int32) }
 
-      # create a struct which registers itself to this registry
-      # and declares a field of the above type
-      s = Rstruct::Structure.new(:rstruct_klass_test_struct2, :register => reg) {
-        int32   :someint1
-        int32   :someint2
-        reg_test_typ :sometype
-      }
+        # confirm the struct is registered
+        reg[:rstruct_klass_test_struct1].should == s
+      end
 
-      # confirm the struct is registered
-      reg[:rstruct_klass_test_struct2].should == s
-      Rstruct.default_registry[:rstruct_klass_test_struct].should be_nil
+      it "should allow structure fields to come from the registry the struct is registered to" do
+        # create a registry for this test
+        reg = $rstruct_klass_reg_test_reg = Rstruct::Registry.new(:rstruct_klass_test_reg2)
 
-      # confirm declaration went ok
-      s.fields.should be_an(Array)
-      s.field_names.should == [:someint1, :someint2, :sometype]
-      s.fields[0,2].each{|f| f.should be_kind_of(Rstruct::Int32) }
-      s.fields.last.should be_kind_of(c)
+        # create a test type registered to this registry
+        c = Class.new(Rstruct::Type)
+        c.register :reg_test_typ, $rstruct_klass_reg_test_reg
+        reg[:reg_test_typ].should == c
 
-    end
+        # create a struct which registers itself to this registry
+        # and declares a field of the above type
+        s = Rstruct::Structure.new(:rstruct_klass_test_struct2, :register => reg) {
+          int32   :someint1
+          int32   :someint2
+          reg_test_typ :sometype
+        }
 
-    it "should allow fields to come an alternate registry without registration of the struct" do
-      # create a registry for this test
-      reg = $rstruct_klass_reg_test_reg2 = Rstruct::Registry.new(:rstruct_klass_test_reg3)
+        # confirm the struct is registered
+        reg[:rstruct_klass_test_struct2].should == s
+        Rstruct.default_registry[:rstruct_klass_test_struct].should be_nil
 
-      # create a test type registered to this registry
-      c = Class.new(Rstruct::Type)
-      c.register :reg_test_typ2, $rstruct_klass_reg_test_reg2
-      reg[:reg_test_typ2].should == c
+        # confirm declaration went ok
+        s.fields.should be_an(Array)
+        s.field_names.should == [:someint1, :someint2, :sometype]
+        s.fields[0,2].each{|f| f.should be_kind_of(Rstruct::Int32) }
+        s.fields.last.should be_kind_of(c)
 
-      # create a struct which registers itself to this registry
-      # and declares a field of the above type
-      s = Rstruct::Structure.new(:rstruct_klass_test_struct2, :fields_from => reg) {
-        int32   :someint1
-        int32   :someint2
-        reg_test_typ2 :sometype
-      }
+      end
 
-      # confirm the struct is not registered
-      reg[:rstruct_klass_test_struct2].should be_nil
-      Rstruct.default_registry[:rstruct_klass_test_struct2].should be_nil
+      it "should allow fields to come an alternate registry without registration of the struct" do
+        # create a registry for this test
+        reg = $rstruct_klass_reg_test_reg2 = Rstruct::Registry.new(:rstruct_klass_test_reg3)
 
-      # confirm declaration went ok
-      s.fields.should be_an(Array)
-      s.field_names.should == [:someint1, :someint2, :sometype]
-      s.fields[0,2].each{|f| f.should be_kind_of(Rstruct::Int32) }
-      s.fields.last.should be_kind_of(c)
+        # create a test type registered to this registry
+        c = Class.new(Rstruct::Type)
+        c.register :reg_test_typ2, $rstruct_klass_reg_test_reg2
+        reg[:reg_test_typ2].should == c
 
-    end
+        # create a struct which registers itself to this registry
+        # and declares a field of the above type
+        s = Rstruct::Structure.new(:rstruct_klass_test_struct2, :fields_from => reg) {
+          int32   :someint1
+          int32   :someint2
+          reg_test_typ2 :sometype
+        }
 
+        # confirm the struct is not registered
+        reg[:rstruct_klass_test_struct2].should be_nil
+        Rstruct.default_registry[:rstruct_klass_test_struct2].should be_nil
 
-    it "should not register a structure by default" do
-      (s=Rstruct::Structure.new(:rstruct_klass_not_reg_dflt){}).should be_a(Rstruct::Structure)
-      Rstruct.default_registry.get(:rstruct_klass_not_reg_dflt).should be_nil
-    end
+        # confirm declaration went ok
+        s.fields.should be_an(Array)
+        s.field_names.should == [:someint1, :someint2, :sometype]
+        s.fields[0,2].each{|f| f.should be_kind_of(Rstruct::Int32) }
+        s.fields.last.should be_kind_of(c)
 
-    it "should allow a struct to explicitely opt out of registration" do
-      (s=Rstruct::Structure.new(:rstruct_klass_not_reg, :register=>false){}).should be_a(Rstruct::Structure)
-      Rstruct.default_registry.get(:rstruct_klass_not_reg).should be_nil
-    end
+      end
 
-    it "should allow a struct to register itself with the default registry" do
-      (s=Rstruct::Structure.new(:rstruct_klass_registered, :register=>true){}).should be_a(Rstruct::Structure)
-      Rstruct.default_registry.get(:rstruct_klass_registered).should == s
+      it "should allow a struct to register itself to a different registry than some of its fields" do
+        # create 2 registries for this test
+        reg = $rstruct_struct_reg_test_reg3 = Rstruct::Registry.new(:rstuct_klass_test_reg3)
+        sreg = Rstruct::Registry.new(:rstuct_klass_test_reg3)
+
+        # create a test type registered to this registry
+        c = Class.new(Rstruct::Type)
+        c.register :reg_test_typ2, $rstruct_struct_reg_test_reg3
+        reg[:reg_test_typ2].should == c
+        sreg[:reg_test_typ2].should be_nil
+
+        # create a struct which registers to one registry, but looks up fields from another
+        # and declares a field of the above type
+        s = Rstruct::Structure.new(:rstuct_klass_test_struct3, :fields_from => reg, :register => sreg) {
+          int32   :someint1
+          int32   :someint2
+          reg_test_typ2 :sometype
+        }
+
+        # confirm the struct is correctly registered
+        sreg[:rstuct_klass_test_struct3].should == s
+        reg[:rstuct_klass_test_struct3].should be_nil
+
+        # confirm declaration went ok
+        s.fields.should be_an(Array)
+        s.field_names.should == [:someint1, :someint2, :sometype]
+        s.fields[0,2].each{|f| f.should be_kind_of(Rstruct::Int32) }
+        s.fields.last.should be_kind_of(c)
+      end
+
     end
 
   end
