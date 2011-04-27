@@ -22,6 +22,18 @@ describe Rstruct do
     c.default_registry.should == Rstruct::Registry::DEFAULT_REGISTRY
   end
 
+  context 'Typedefs' do
+    it "should allow types to be aliased with 'typedef'" do
+      Rstruct.typedef(:int32, :int32_copy)
+      reg = Rstruct.default_registry
+      reg[:int32_copy].should == reg[:int32]
+    end
+
+    it "should raise an exception when invalid types are aliased with 'typedef'" do
+      lambda{ Rstruct.typedef(:nonexistent_type, :int32_copy) }.should raise_error(Rstruct::InvalidTypeError)
+    end
+  end
+
   context "The struct method" do
     it "requires a block" do
       lambda { Rstruct.struct(:rspec_fail_block) }.should raise_error(ArgumentError)

@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'registry_behaviors'
 
 describe Rstruct::Registry do
   before(:all) do
@@ -10,16 +11,47 @@ describe Rstruct::Registry do
   end
 
   context "default registry" do
-    it "should have several basic types already registered" do
-      @dflt_reg.get(:byte).should == Rstruct::Byte
-      @dflt_reg.get(:char).should == Rstruct::Char
-      @dflt_reg.get(:int).should  == Rstruct::Int
-      @dflt_reg.get(:short).should == Rstruct::Short
-      @dflt_reg.get(:long).should  == Rstruct::Long
-      @dflt_reg.get(:uint).should  == Rstruct::Uint
-      @dflt_reg.get(:ushort).should == Rstruct::Ushort
-      @dflt_reg.get(:ulong).should == Rstruct::Ulong
-      @dflt_reg.get(:struct).should == Rstruct::Structure
+    before(:all) do
+      @registry = @dflt_reg
+      @reg_name = :default
     end
+
+    it_should_behave_like "a basic Rstruct registry"
+
+  end
+
+  context "creating a new registry" do
+    before(:all) do
+      @reg_name = :rspec_test_registry
+      @preg = Rstruct::Registry.new(:parent_reg)
+      @registry = Rstruct::Registry.new(@reg_name)
+    end
+
+    it "should inherit types from the default registry" do
+      @registry[:byte].should == Rstruct::Byte
+      @registry[:int].should == Rstruct::Int
+      @registry.inherits.should == [Rstruct.default_registry]
+    end
+
+    it "should inherit types from arbitrary registries" do
+      @registry.inherits.unshift(@preg)
+      c=Class.new(Rstruct::Type)
+      @preg.register(c, :some_parent_reg_type)
+      @preg[:some_parent_reg_type].should == c
+      @registry[:some_parent_reg_type].should == c
+      Rstruct.default_registry[c].should be_nil
+    end
+
+    it "should register types only its own registry" do
+      typ = :"test_parent_reg_#{@registry.name}_1"
+      obj=Class.new(Rstruct::Type)
+
+      @registry.register(obj,typ)
+      @registry[typ].should == obj
+      Rstruct.default_registry[typ].should be_nil
+    end
+
+    it_should_behave_like "a basic Rstruct registry"
+
   end
 end
