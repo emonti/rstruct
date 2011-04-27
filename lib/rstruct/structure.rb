@@ -16,8 +16,8 @@ module Rstruct
         reg.register(self, name.to_sym)
       end
 
+      super(name, opts) {} # need a block here since we're claiming the caller's
       @fields = builder.new(reg, &block).__fields
-      super(name)
     end
 
     def format

@@ -28,8 +28,10 @@ module Rstruct
     attr_reader :name
     attr_accessor :value
 
-    def initialize(name)
+    def initialize(name, opts={}, &block)
+      @opts = opts.dup
       @name = name
+      yield self if block_given?
     end
 
   end
@@ -37,10 +39,11 @@ module Rstruct
   class PackedType < Type
     attr_reader :size, :format
 
-    def initialize(name, size, format)
+    def initialize(name, size, format, opts={}, &block)
       @name = name.to_sym
       @size = size
       @format = format
+      super(name, opts, &block)
     end
   end
 
