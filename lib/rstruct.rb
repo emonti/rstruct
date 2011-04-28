@@ -1,5 +1,5 @@
+require 'stringio'
 require 'rstruct/registry'
-require 'rstruct/type'
 require 'rstruct/types'
 require 'rstruct/structure'
 require 'rstruct/struct_builder'

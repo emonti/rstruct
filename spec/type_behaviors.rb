@@ -1,19 +1,35 @@
-shared_examples_for "a parseable type" do
-  it "should read and parse a raw string correctly"
+require 'stringio'
 
-  it "should read and parse raw data from StringIO stream correctly"
+shared_examples_for "a packable type" do
+  it "should pack to a string correctly without an output" do
+    @populate.call()
+    @struct.pack.should == @rawdat
+  end
 
-  it "should read and parse raw data from file io stream correctly"
+  it "should unpack correctly from a string" do
+    ret=@struct.unpack(@rawdat)
+#    @values.each { |k,v| @struct[k].should == v }
+  end
 
-  it "should read and parse raw data from a network stream correctly"
+  it "should unpack correctly from a StringIO object" do
+    s=StringIO.new(@rawdat)
+    ret=@struct.unpack(s)
+#    @values.each { |k,v| @struct[k].should == v }
+  end
+
+
 end
 
-shared_examples_for "a composeable type" do
-  it "should compose a string correctly"
+shared_examples_for "a groupable type" do
+  it "should be groupable" do
+    @struct.should be_groupable
+  end
 
-  it "should be writeable to a StringIO stream correctly"
+  it "should have the correct format" do
+    @struct.format.should == @pack_format
+  end
 
-  it "should be writeable to a file io stream correctly"
-
-  it "should be writeable to a network stream correctly"
+  it_should_behave_like "a packable type"
 end
+
+

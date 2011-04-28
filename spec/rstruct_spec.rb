@@ -42,13 +42,21 @@ describe Rstruct do
   end
 
   context "The struct method" do
-    it "requires a block" do
+    it "should require a block" do
       lambda { Rstruct.struct(:rspec_fail_block) }.should raise_error(ArgumentError)
     end
 
-    it "should return a structure" do
-      Rstruct.struct(:rspec_return_struct, :register => false){}.should be_a(Rstruct::Structure)
+    it "should require fields to be defined in the block" do
+      lambda { 
+        Rstruct.struct(:rspec_return_struct, :register => false){ }
+      }.should raise_error(Rstruct::StructError)
     end
+
+    it "should return a structure" do
+      s=Rstruct.struct(:rspec_return_struct, :register => false){ byte :foo }
+      s.should be_a(Rstruct::Structure)
+    end
+
 
     it "should define structures the same way as by calling Rstruct::Structure.new" do
       s = Rstruct.struct(:rspec_struct_test) {

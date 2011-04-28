@@ -8,7 +8,8 @@ describe Rstruct::Structure do
     end
 
     it "should return a structure" do
-      Rstruct::Structure.new(:rstruct_klass_return_struct, :register => false){}.should be_a(Rstruct::Structure)
+      s=Rstruct::Structure.new(:rstruct_klass_return_struct, :register => false){ byte :foo }
+      s.should be_a(Rstruct::Structure)
     end
 
     it "should allow structure fields to be defined" do
@@ -24,18 +25,22 @@ describe Rstruct::Structure do
     end
 
     context 'registration' do
+
       it "should not register a structure by default" do
-        (s=Rstruct::Structure.new(:rstruct_klass_not_reg_dflt){}).should be_a(Rstruct::Structure)
+        s=Rstruct::Structure.new(:rstruct_klass_not_reg_dflt){ byte :foo }
+        s.should be_a(Rstruct::Structure)
         Rstruct.default_registry.get(:rstruct_klass_not_reg_dflt).should be_nil
       end
 
       it "should allow a struct to explicitely opt out of registration" do
-        (s=Rstruct::Structure.new(:rstruct_klass_not_reg, :register=>false){}).should be_a(Rstruct::Structure)
+        s=Rstruct::Structure.new(:rstruct_klass_not_reg, :register=>false){ byte :foo}
+        s.should be_a(Rstruct::Structure)
         Rstruct.default_registry.get(:rstruct_klass_not_reg).should be_nil
       end
 
       it "should allow a struct to register itself with the default registry" do
-        (s=Rstruct::Structure.new(:rstruct_klass_registered, :register=>true){}).should be_a(Rstruct::Structure)
+        s=Rstruct::Structure.new(:rstruct_klass_registered, :register=>true){ byte :foo}
+        s.should be_a(Rstruct::Structure)
         Rstruct.default_registry.get(:rstruct_klass_registered).should == s
       end
 
@@ -150,16 +155,59 @@ describe Rstruct::Structure do
 
   end
 
-  context "A simple fixed-length struct" do
-    before :all do
+  context "a simple fixed-length struct" do
+    before :each do
       @struct = Rstruct::Structure.new(:simple_fixed_length_struct) {
-        int32   :someint1
-        int32   :someint2
+        uint32be  :someint1
+        uint32be  :someint2
       }
+
+      @values = { :someint1 => 0xdeadbeef, :someint2 => 0xfacefeeb }
+
+      @populate = lambda { @values.each { |k,v| @struct[k] = v } }
+      @pack_format = "NN"
+      @rawdat = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb"
     end
 
-    it_should_behave_like "a parseable type"
-    it_should_behave_like "a composeable type"
+    it_should_behave_like "a groupable type"
   end
 
+  context "a fixed-length mach_header struct" do
+    before :each do
+      Rstruct.typedef :uint32le, :cpu_type_t unless Rstruct.default_registry[:cpu_type_t]
+      Rstruct.typedef :uint32le, :cpu_subtype_t unless Rstruct.default_registry[:cpu_subtype_t]
+
+      @struct = Rstruct.struct(:mach_header) {
+        uint32le      :magic      # mach magic number identifier
+        cpu_type_t    :cputype    # cpu specifier
+        cpu_subtype_t :cpusubtype # machine specifier
+        uint32le      :filetype   # type of file
+        uint32le      :ncmds      # number of load commands
+        uint32le      :sizeofcmds # the size of all the load commands
+        uint32le      :flags      # flags
+      }
+
+      @values = {
+        :magic      => 0xfeedface,
+        :cputype    => 0x00000007,
+        :cpusubtype => 0x00000003,
+        :filetype   => 0x00000002,
+        :ncmds      => 0x0000000d,
+        :sizeofcmds => 0x000005ec,
+        :flags      => 0x00000085,
+      }
+
+      @pack_format = "VVVVVVV"
+
+      @populate = lambda { @values.each { |k,v| @struct[k] = v } }
+
+      @rawdat = @values.values_at(
+        :magic, :cputype, :cpusubtype, :filetype, :ncmds, :sizeofcmds, :flags
+      ).pack(@pack_format)
+
+      @rawdat.should == "\316\372\355\376\a\000\000\000\003\000\000\000\002\000\000\000\r\000\000\000\354\005\000\000\205\000\000\000"
+    end
+
+    it_should_behave_like "a groupable type"
+  end
 end

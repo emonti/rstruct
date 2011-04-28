@@ -1,4 +1,4 @@
-require 'rstruct/type'
+require 'rstruct/base_types'
 
 module Rstruct
 

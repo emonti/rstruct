@@ -1,12 +1,15 @@
-require 'rstruct/type'
+require 'rstruct/base_types'
 require 'rstruct/struct_builder'
 require 'rstruct/registry'
 
 module Rstruct
+  class StructError < StandardError
+  end
+
   class Structure < ContainerType
     register :struct
 
-    attr_reader :fields
+    attr_reader :fields, :field_names
 
     def initialize(name, opts={}, &block)
       builder = opts[:builder] || StructBuilder
@@ -18,31 +21,32 @@ module Rstruct
 
       lkupreg = (opts[:fields_from])
 
-      super(name, opts) {} # need a block here since we're claiming the caller's
+      # pass a nil block to super to ensure we're claiming the caller's
+      super(name, opts, &(nil))
+
       @fields = builder.new((lkupreg || reg), &block).__fields
+
+      raise(StructError, "no fields were defined") if @fields.empty?
+
+      @field_names = @fields.map{|f| f.name }
+      @mystruct = Struct.new(*@field_names)
     end
 
-    def format
-      if self.is_packable?
-        @fields.map{|f| f.format }.join
-      end
+    def container
+      @container ||= @mystruct.new
     end
 
-    def size
-      @fields.inject(0){|s,v| s+=v.size}
+    def groupable?
+      @fields.find{|f| not f.groupable? }.nil?
     end
 
-    def field_names
-      @fields.map{|f| f.name}
+    def _pack
+      a = *self.value
+      a.pack(self.format)
     end
 
-    def value
-      @fields.map{|f| f.value}
+    def _unpack(raw)
+      raw.unpack(self.format)
     end
-
-    def is_packable?
-      @fields.find{|f| not f.is_packable? }.nil?
-    end
-
   end
 end
