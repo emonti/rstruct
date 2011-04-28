@@ -7,19 +7,13 @@ module Rstruct
   end
 
   class Structure < ContainerType
-    register :struct
-
-    attr_reader :fields, :field_names
+    attr_reader :fields
 
     def initialize(name, opts={}, &block)
+      lkupreg = (opts[:fields_from]) # allow a seperate reg for member types
       builder = opts[:builder] || StructBuilder
-
-      if reg=opts[:register]
-        reg=Registry::DEFAULT_REGISTRY if reg==true # true is shorthand for default
-        reg.register(self, name.to_sym)
-      end
-
-      lkupreg = (opts[:fields_from])
+      reg = opts[:register]
+      reg=nil if reg==true
 
       # pass a nil block to super to ensure we're claiming the caller's
       super(name, opts, &(nil))
@@ -28,25 +22,11 @@ module Rstruct
 
       raise(StructError, "no fields were defined") if @fields.empty?
 
-      @field_names = @fields.map{|f| f.name }
       @mystruct = Struct.new(*@field_names)
     end
 
-    def container
-      @container ||= @mystruct.new
-    end
-
     def groupable?
-      @fields.find{|f| not f.groupable? }.nil?
-    end
-
-    def _pack
-      a = *self.value
-      a.pack(self.format)
-    end
-
-    def _unpack(raw)
-      raw.unpack(self.format)
+      @fields.find{|f| not f.groupable?}.nil?
     end
   end
 end

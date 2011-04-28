@@ -21,15 +21,15 @@ describe Rstruct::Structure do
       s.size.should == 8
       s.fields.should be_an(Array)
       s.field_names.should == [:someint1, :someint2]
-      s.fields.each{|f| f.should be_kind_of(Rstruct::Int32) }
+      s.field_types.should == [Rstruct::Int32, Rstruct::Int32]
     end
 
     context 'registration' do
 
-      it "should not register a structure by default" do
+      it "should register a structure by default" do
         s=Rstruct::Structure.new(:rstruct_klass_not_reg_dflt){ byte :foo }
         s.should be_a(Rstruct::Structure)
-        Rstruct.default_registry.get(:rstruct_klass_not_reg_dflt).should be_nil
+        Rstruct.default_registry.get(:rstruct_klass_not_reg_dflt).should == s
       end
 
       it "should allow a struct to explicitely opt out of registration" do
@@ -57,7 +57,7 @@ describe Rstruct::Structure do
         # confirm declaration went ok
         s.fields.should be_an(Array)
         s.field_names.should == [:someint1, :someint2]
-        s.fields.each{|f| f.should be_kind_of(Rstruct::Int32) }
+        s.field_types.should == [Rstruct::Int32, Rstruct::Int32]
 
         # confirm the struct is registered
         reg[:rstruct_klass_test_struct1].should == s
@@ -65,11 +65,10 @@ describe Rstruct::Structure do
 
       it "should allow structure fields to come from the registry the struct is registered to" do
         # create a registry for this test
-        reg = $rstruct_klass_reg_test_reg = Rstruct::Registry.new(:rstruct_klass_test_reg2)
+        reg = Rstruct::Registry.new(:rstruct_klass_test_reg2)
 
         # create a test type registered to this registry
-        c = Class.new(Rstruct::Type)
-        c.register :reg_test_typ, $rstruct_klass_reg_test_reg
+        c = Rstruct::Type.new(:reg_test_typ, :register => reg)
         reg[:reg_test_typ].should == c
 
         # create a struct which registers itself to this registry
@@ -87,23 +86,20 @@ describe Rstruct::Structure do
         # confirm declaration went ok
         s.fields.should be_an(Array)
         s.field_names.should == [:someint1, :someint2, :sometype]
-        s.fields[0,2].each{|f| f.should be_kind_of(Rstruct::Int32) }
-        s.fields.last.should be_kind_of(c)
-
+        s.field_types.should == [Rstruct::Int32, Rstruct::Int32, c]
       end
 
       it "should allow fields to come an alternate registry without registration of the struct" do
         # create a registry for this test
-        reg = $rstruct_klass_reg_test_reg2 = Rstruct::Registry.new(:rstruct_klass_test_reg3)
+        reg = Rstruct::Registry.new(:rstruct_klass_test_reg3)
 
         # create a test type registered to this registry
-        c = Class.new(Rstruct::Type)
-        c.register :reg_test_typ2, $rstruct_klass_reg_test_reg2
+        c = Rstruct::Type.new(:reg_test_typ2, :register => reg)
         reg[:reg_test_typ2].should == c
 
         # create a struct which registers itself to this registry
         # and declares a field of the above type
-        s = Rstruct::Structure.new(:rstruct_klass_test_struct2, :fields_from => reg) {
+        s = Rstruct::Structure.new(:rstruct_klass_test_struct2, :fields_from => reg, :register => false) {
           int32   :someint1
           int32   :someint2
           reg_test_typ2 :sometype
@@ -116,19 +112,16 @@ describe Rstruct::Structure do
         # confirm declaration went ok
         s.fields.should be_an(Array)
         s.field_names.should == [:someint1, :someint2, :sometype]
-        s.fields[0,2].each{|f| f.should be_kind_of(Rstruct::Int32) }
-        s.fields.last.should be_kind_of(c)
-
+        s.field_types.should == [Rstruct::Int32, Rstruct::Int32, c]
       end
 
       it "should allow a struct to register itself to a different registry than some of its fields" do
         # create 2 registries for this test
-        reg = $rstruct_struct_reg_test_reg3 = Rstruct::Registry.new(:rstuct_klass_test_reg3)
+        reg = Rstruct::Registry.new(:rstuct_klass_test_reg3)
         sreg = Rstruct::Registry.new(:rstuct_klass_test_reg3)
 
         # create a test type registered to this registry
-        c = Class.new(Rstruct::Type)
-        c.register :reg_test_typ2, $rstruct_struct_reg_test_reg3
+        c = Rstruct::Type.new(:reg_test_typ2, :register => reg)
         reg[:reg_test_typ2].should == c
         sreg[:reg_test_typ2].should be_nil
 
@@ -147,8 +140,7 @@ describe Rstruct::Structure do
         # confirm declaration went ok
         s.fields.should be_an(Array)
         s.field_names.should == [:someint1, :someint2, :sometype]
-        s.fields[0,2].each{|f| f.should be_kind_of(Rstruct::Int32) }
-        s.fields.last.should be_kind_of(c)
+        s.field_types.should == [Rstruct::Int32, Rstruct::Int32, c]
       end
 
     end
@@ -157,7 +149,7 @@ describe Rstruct::Structure do
 
   context "a simple fixed-length struct" do
     before :each do
-      @struct = Rstruct::Structure.new(:simple_fixed_length_struct) {
+      @struct = Rstruct::Structure.new(:simple_fixed_length_struct, :register => false) {
         uint32be  :someint1
         uint32be  :someint2
       }
@@ -169,6 +161,7 @@ describe Rstruct::Structure do
       @rawdat = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb"
     end
 
+    it_should_behave_like "a basic type"
     it_should_behave_like "a groupable type"
   end
 
@@ -177,7 +170,7 @@ describe Rstruct::Structure do
       Rstruct.typedef :uint32le, :cpu_type_t unless Rstruct.default_registry[:cpu_type_t]
       Rstruct.typedef :uint32le, :cpu_subtype_t unless Rstruct.default_registry[:cpu_subtype_t]
 
-      @struct = Rstruct.struct(:mach_header) {
+      @struct = Rstruct.struct(:mach_header, :register => false) {
         uint32le      :magic      # mach magic number identifier
         cpu_type_t    :cputype    # cpu specifier
         cpu_subtype_t :cpusubtype # machine specifier
@@ -206,8 +199,34 @@ describe Rstruct::Structure do
       ).pack(@pack_format)
 
       @rawdat.should == "\316\372\355\376\a\000\000\000\003\000\000\000\002\000\000\000\r\000\000\000\354\005\000\000\205\000\000\000"
+
     end
 
+    it_should_behave_like "a basic type"
+    it_should_behave_like "a groupable type"
+  end
+
+  context "a simple fixed-length nested struct" do
+    before :each do
+      inner_struct = Rstruct::Structure.new(:inner_fix_len_test, :register => true) {
+        byte :byte1
+        byte :byte2
+      } unless Rstruct.default_registry[:inner_fix_len_test]
+
+      @struct = Rstruct::Structure.new(:simple_fixed_length_struct, :register => false) {
+        uint32be  :someint1
+        uint32be  :someint2
+        inner_fix_len_test :inner
+      }
+
+      @values = { :someint1 => 0xdeadbeef, :someint2 => 0xfacefeeb }
+
+      @pack_format = "NNcc"
+      @rawdat = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02"
+    end
+
+    it_should_behave_like "a basic type"
     it_should_behave_like "a groupable type"
   end
 end
+

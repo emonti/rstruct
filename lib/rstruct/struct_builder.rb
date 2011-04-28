@@ -2,6 +2,22 @@ require 'rstruct/registry'
 
 module Rstruct
 
+  class Field
+    attr_reader :name, :typ_name, :typ, :args, :block
+
+    def initialize(name, typ, typ_name, args, block)
+      @name=name
+      @typ=typ
+      @typ_name = typ_name || typ
+      @args=args
+      @block=block
+    end
+
+    def method_missing(name, *args, &block)
+      @typ.__send__(name, *args, &block)
+    end
+  end
+
   class StructBuilder
     attr_reader :__fields, :__registry
 
@@ -11,24 +27,17 @@ module Rstruct
       instance_eval &block
     end
 
+    def field(name, typ, typ_name, *args, &block)
+      @__fields << Field.new(name,typ,typ_name,args,block)
+    end
+
     def method_missing(typ_arg, *args, &block)
       name = args.shift
       unless typ = @__registry.get(typ_arg)
         raise TypeNotFoundError, "invalid field type #{typ_arg}"
       end
 
-      # We accept what look like object references to
-      # types. This allows us to handle pointers and arrays
-      # in a declarative manner similar to C structs.
-      if name.nil? and args.empty?
-        return typ
-      else
-        __field(typ, name, *args, &block)
-      end
-    end
-
-    def __field(typ, name, *args, &block)
-      @__fields << typ.instance(name, *args, &block)
+      field(name, typ, typ_arg, *args, &block)
     end
   end
 

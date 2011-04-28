@@ -13,7 +13,6 @@ shared_examples_for "a basic Rstruct registry" do
     @registry.get(:uint).should  == Rstruct::Uint
     @registry.get(:ushort).should == Rstruct::Ushort
     @registry.get(:ulong).should == Rstruct::Ulong
-    @registry.get(:struct).should == Rstruct::Structure
   end
 
   it "should allow types to be retrieved with 'get' or '[]'" do

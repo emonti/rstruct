@@ -1,150 +1,43 @@
 require 'rstruct/base_types'
 
 module Rstruct
+  Char = PackedType.new(:char, 1, "A", :alias => [:char, :char_t])
 
-  class Byte < PackedType
-    register [:byte, :BYTE]
+  Byte = PackedType.new(:byte, 1, "c", :alias => [:BYTE, :signed_byte])
 
-    def initialize(name, opts={}, &block)
-      super(name, 1, "C", opts, &block)
-    end
-  end
+  Ubyte = PackedType.new(:ubyte, 1, "C", :alias => [:UBYTE, :unsigned_byte])
 
-  class Char < PackedType
-    register [:char, :char_t]
+  Pointer = PackedType.new(:pointer, [0].pack("L_").size , "L_", :alias => :pointer)
 
-    def initialize(name, opts={}, &block)
-      super(name, 1, "A", opts, &block)
-    end
-  end
+  Int = PackedType.new(:int, [0].pack("i_").size, "i_", :alias => [:int_t, :bool, :BOOL, :signed_int])
 
-  class Int < PackedType
-    register [:int, :int_t, :bool, :BOOL]
-    SIZE = [0].pack("i_").size
+  Uint = PackedType.new(:uint, [0].pack("I_").size, "I_", :alias => [:uint_t, :unsigned_int])
 
-    def initialize(name, opts={}, &block)
-      super(name, SIZE, "i_", opts, &block)
-    end
-  end
+  Short = PackedType.new(:short, [0].pack("s_").size, "s_", :alias => [:short_t, :signed_short])
 
-  class Uint < PackedType
-    register [:uint, :uint_t, :unsigned_int]
-    SIZE = [0].pack("I_").size
+  Ushort = PackedType.new(:ushort, [0].pack("S_").size, "S_", :alias => [:ushort_t, :unsigned_short])
 
-    def initialize(name, opts={}, &block)
-      super(name, SIZE, "I_", opts, &block)
-    end
-  end
+  Long = PackedType.new(:long, [0].pack("l_").size, "l_", :alias => [:long_t, :signed_long])
 
-  class Short < PackedType
-    register [:short, :short_t]
-    SIZE = [0].pack("s_").size
+  Ulong = PackedType.new(:ulong, [0].pack("L_").size, "L_", :alias => [:ulong_t, :unsigned_long])
 
-    def initialize(name, opts={}, &block)
-      super(name, SIZE, "s_", opts, &block)
-    end
-  end
+  Int16 = PackedType.new(:int16, 2, 's', :alias => [:int16_t, :i16, :i16_t, :signed_int16])
 
-  class Ushort < PackedType
-    register [:ushort, :ushort_t, :unsigned_short]
-    SIZE = [0].pack("S_").size
-    def initialize(name, opts={}, &block)
-      super(name, SIZE, "S_", opts, &block)
-    end
-  end
+  Uint16 = PackedType.new(:uint16, 2, 'S', :alias => [:uint16_t, :u16, :u16_t, :unsigned_int16])
 
-  class Long < PackedType
-    register [:long, :long_t]
-    SIZE = [0].pack("l_").size
-    def initialize(name, opts={}, &block)
-      super(name, SIZE, "l_", opts, &block)
-    end
-  end
+  Int32 = PackedType.new(:int32, 4, "l", :alias => [:int32_t, :i32, :i32_t, :signed_int32])
 
-  class Ulong < PackedType
-    register [:ulong, :ulong_t, :unsigned_long]
-    SIZE = [0].pack("L_").size
-    def initialize(name, opts={}, &block)
-      super(name, SIZE, "L_", opts, &block)
-    end
-  end
+  Uint32 = PackedType.new(:uint32, 4, "L", :alias => [:uint32_t, :u32, :u32_t, :unsigned_int32])
 
-  class Int16 < PackedType
-    register [:int16, :int16_t, :i16, :i16_t]
-    def initialize(name, opts={}, &block)
-      super(name, 2, "s", opts, &block)
-    end
-  end
+  Int64 = PackedType.new(:int64, 8, "q", :alias => [:int64_t, :i64, :i64_t, :signed_int64])
 
-  class Uint16 < PackedType
-    register [:uint16, :uint16_t, :u16, :u16_t, :unsigned_int16]
-    def initialize(name, opts={}, &block)
-      super(name, 2, "S", opts, &block)
-    end
-  end
+  Uint64 = PackedType.new(:uint64, 8, "Q", :alias => [:uint64_t, :u64, :u64_t, :unsigned_int64])
 
-  class Int32 < PackedType
-    register [:int32, :int32_t, :i32, :i32_t]
-    def initialize(name, opts={}, &block)
-      super(name, 4, "l", opts, &block)
-    end
-  end
+  Uint16le = PackedType.new(:uint16le, 2, "v", :alias => [:uint16_le, :ul16, :le16])
 
-  class Uint32 < PackedType
-    register [:uint32, :uint32_t, :u32, :u32_t, :unsigned_int32]
-    def initialize(name, opts={}, &block)
-      super(name, 4, "L", opts, &block)
-    end
-  end
+  Uint32le = PackedType.new(:uint32le, 4, "V", :alias => [:uint32_le, :ul32, :le32])
 
-  class Int64 < PackedType
-    register [:int64, :int64_t, :i64, :i64_t]
-    def initialize(name, opts={}, &block)
-      super(name, 8, "q", opts, &block)
-    end
-  end
+  Uint16be = PackedType.new(:uint16be, 2, "n", :alias => [:uint16_be, :ub16, :be16])
 
-  class Uint64 < PackedType
-    register [:uint64, :uint64_t, :u64, :u64_t, :unsigned_int64]
-    def initialize(name, opts={}, &block)
-      super(name, 8, "Q", opts, &block)
-    end
-  end
-
-  class Uint16le < PackedType
-    register [:uint16le, :uint16_le, :ul16, :le16, :unsigned_int16le]
-    def initialize(name, opts={}, &block)
-      super(name, 8, "v", opts, &block)
-    end
-  end
-
-  class Uint32le < PackedType
-    register [:uint32le, :uint32_le, :ul32, :le32, :unsigned_int32le]
-    def initialize(name, opts={}, &block)
-      super(name, 8, "V", opts, &block)
-    end
-  end
-
-  class Uint16be < PackedType
-    register [:uint16be, :uint16_be, :ub16, :be16, :unsigned_int16be]
-    def initialize(name, opts={}, &block)
-      super(name, 8, "n", opts, &block)
-    end
-  end
-
-  class Uint32be < PackedType
-    register [:uint32be, :uint32_be, :ub32, :be32, :unsigned_int32be]
-    def initialize(name, opts={}, &block)
-      super(name, 8, "N", opts, &block)
-    end
-  end
-
-  class Pointer < PackedType
-    register
-    SIZE = [0].pack("L_").size
-
-    def initialize(name, typ, opts={}, &block)
-      super(name, SIZE, "L_", opts, &block)
-    end
-  end
+  Uint32be = PackedType.new(:uint32be, 4, "N", :alias => [:uint32_be, :ub32, :be32])
 end

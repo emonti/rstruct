@@ -3,16 +3,13 @@ require 'rstruct/base_types/type'
 module Rstruct
 
   class ContainerType < Type
-    def value
-      self.container.to_a
+    def initialize(*args, &block)
+      @countainer = true
+      super(*args, &block)
     end
 
-    def []=(k,v)
-      self.container[k]=v
-    end
-
-    def [](k)
-      self.container[k]
+    def groupable?
+      self.fields.find {|f| not f.groupable? }.nil?
     end
 
     def format
@@ -34,6 +31,14 @@ module Rstruct
         end
       end
     end
-  end
 
+    def field_names
+      @field_names ||= self.fields.map{|f| f.name }
+    end
+
+    def field_types 
+      @field_types ||= self.fields.map{|f| f.typ }
+    end
+
+  end
 end

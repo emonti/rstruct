@@ -64,10 +64,23 @@ describe Rstruct do
         int32   :someint2
       }
       s.should be_a(Rstruct::Structure)
+      s.name.should == :rspec_struct_test
       s.size.should == 8
       s.fields.should be_an(Array)
       s.field_names.should == [:someint1, :someint2]
-      s.fields.each{|f| f.should be_kind_of(Rstruct::Int32) }
+
+      f1 = s.fields[0]
+      f2 = s.fields[1]
+      f1.typ.should be_a(Rstruct::Type)
+      f2.typ.should be_a(Rstruct::Type)
+      f1.typ.name.should == :int32
+      f2.typ.name.should == :int32
+      f1.name.should == :someint1
+      f2.name.should == :someint2
+      f1.args.should be_empty
+      f2.args.should be_empty
+      f1.block.should be_nil
+      f2.block.should be_nil
     end
 
   end

@@ -36,8 +36,7 @@ describe Rstruct::Registry do
     it "should inherit types from arbitrary registries" do
       begin
         @registry.inherits.unshift(@preg)
-        c=Class.new(Rstruct::Type)
-        @preg.register(c, :some_parent_reg_type)
+        c=Rstruct::Type.new(:some_parent_reg_type, :register => @preg)
         @preg[:some_parent_reg_type].should == c
         @registry[:some_parent_reg_type].should == c
         Rstruct.default_registry[c].should be_nil
