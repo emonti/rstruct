@@ -19,7 +19,14 @@ describe Rstruct do
     c=Class.new(Object){ extend(Rstruct::ClassMethods) }
     c.should respond_to(:struct)
     c.should respond_to(:default_registry)
+    c.should respond_to(:typedef)
     c.default_registry.should == Rstruct::Registry::DEFAULT_REGISTRY
+
+    m=Module.new{ extend(Rstruct::ClassMethods) }
+    m.should respond_to(:struct)
+    m.should respond_to(:default_registry)
+    m.should respond_to(:typedef)
+    m.default_registry.should == Rstruct::Registry::DEFAULT_REGISTRY
   end
 
   context 'Typedefs' do
@@ -43,14 +50,13 @@ describe Rstruct do
       Rstruct.struct(:rspec_return_struct, :register => false){}.should be_a(Rstruct::Structure)
     end
 
-    it "should allow structure fields to be defined the same way as by calling Rstruct::Structure.new" do
+    it "should define structures the same way as by calling Rstruct::Structure.new" do
       s = Rstruct.struct(:rspec_struct_test) {
         int32   :someint1
         int32   :someint2
       }
       s.should be_a(Rstruct::Structure)
       s.size.should == 8
-      s.format.should == "ll"
       s.fields.should be_an(Array)
       s.field_names.should == [:someint1, :someint2]
       s.fields.each{|f| f.should be_kind_of(Rstruct::Int32) }

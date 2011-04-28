@@ -18,7 +18,6 @@ describe Rstruct::Structure do
       }
       s.should be_a(Rstruct::Structure)
       s.size.should == 8
-      s.format.should == "ll"
       s.fields.should be_an(Array)
       s.field_names.should == [:someint1, :someint2]
       s.fields.each{|f| f.should be_kind_of(Rstruct::Int32) }
