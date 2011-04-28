@@ -36,8 +36,6 @@ module Rstruct
     #     uint32_t      :flags      # flags
     #   }
     #
-    # The DSL interface for this method is implemented by
-    # Rstruct::StructBuilder.
     def struct(name, opts={},&block)
       Rstruct::Structure.new(name, opts, &block)
     end

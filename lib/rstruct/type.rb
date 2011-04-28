@@ -34,6 +34,18 @@ module Rstruct
       yield self if block_given?
     end
 
+    def parse(stream)
+      raise(NotImplementedError, 'base class stub called')
+    end
+
+    def write(stream)
+      raise(NotImplementedError, 'base class stub called')
+    end
+
+    def is_packable?
+      raise(NotImplementedError, 'base class stub called')
+    end
+
   end
 
   class PackedType < Type
@@ -45,6 +57,20 @@ module Rstruct
       @format = format
       super(name, opts, &block)
     end
+
+    def parse(stream)
+      dat=nil
+      stream.get{|s| dat = s.read(self.size)}
+    end
+
+    def write(stream)
+      raise("Value not set") unless self.value?
+      dat = *(self.value).pack(self.format)
+      stream.put{|s| s.write(dat) }
+    end
+  end
+
+  class ContainerType < Type
   end
 
 end

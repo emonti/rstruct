@@ -3,7 +3,7 @@ require 'rstruct/struct_builder'
 require 'rstruct/registry'
 
 module Rstruct
-  class Structure < Type
+  class Structure < ContainerType
     register :struct
 
     attr_reader :fields
@@ -23,7 +23,9 @@ module Rstruct
     end
 
     def format
-      @fields.map{|f| f.format }.join
+      if self.is_packable?
+        @fields.map{|f| f.format }.join
+      end
     end
 
     def size
@@ -37,5 +39,10 @@ module Rstruct
     def value
       @fields.map{|f| f.value}
     end
+
+    def is_packable?
+      @fields.find{|f| not f.is_packable? }.nil?
+    end
+
   end
 end
