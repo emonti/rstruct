@@ -3,6 +3,8 @@ require 'rstruct/base_types/type'
 module Rstruct
 
   class ContainerType < Type
+    include Packable
+
     def initialize(*args, &block)
       @countainer = true
       super(*args, &block)

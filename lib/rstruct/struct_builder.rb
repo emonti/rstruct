@@ -34,7 +34,7 @@ module Rstruct
     def method_missing(typ_arg, *args, &block)
       name = args.shift
       unless typ = @__registry.get(typ_arg)
-        raise TypeNotFoundError, "invalid field type #{typ_arg}"
+        raise(InvalidTypeError, "invalid field type: #{typ_arg}")
       end
 
       field(name, typ, typ_arg, *args, &block)

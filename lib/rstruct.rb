@@ -45,6 +45,15 @@ module Rstruct
       reg.typedef(p,t,opts)
     end
 
+    def sizeof(typ, reg=nil)
+      reg ||= default_registry
+      if t=reg[typ]
+        t.sizeof
+      else
+        raise(InvalidTypeError, "unknown type: #{typ}")
+      end
+    end
+
     # Returns the default Rstruct registry
     def default_registry
       Registry::DEFAULT_REGISTRY

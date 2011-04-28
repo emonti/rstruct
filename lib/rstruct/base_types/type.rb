@@ -12,7 +12,7 @@ module Rstruct
       reg=nil if reg==true
       register(regnames, reg) unless reg == false
 
-      yield self if block_given?
+      instance_eval &block if block
     end
 
     def register(names=nil, reg=nil)
@@ -28,6 +28,25 @@ module Rstruct
     def container?
       @container or false
     end
+
+    def claim_value(vals, obj=nil)
+      if @claim_cb
+        @claim_cb.call(vals, obj)
+      else
+        vals.shift
+      end
+    end
+
+    def sizeof
+      self.size
+    end
+
+    private
+      # sets up a call back for claiming values out of an unpacked
+      # value array
+      def claim(&block)
+        @claim_cb = block
+      end
 
   end
 
