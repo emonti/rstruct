@@ -1,7 +1,6 @@
 require 'rstruct/base_types/type'
 
 module Rstruct
-
   class ContainerType < Type
     include Packable
 
@@ -42,5 +41,19 @@ module Rstruct
       @field_types ||= self.fields.map{|f| f.typ }
     end
 
+  end
+
+  module ContainerMixins
+    def rstruct_type
+      @rstruct_type
+    end
+
+    def rstruct_type=(val)
+      if @rstruct_type
+        raise(ArgumentError, "Can't override the rstruct_type once it is set")
+      else
+        @rstruct_type = val
+      end
+    end
   end
 end

@@ -161,7 +161,8 @@ describe Rstruct::Structure do
       @rawdat = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb"
     end
 
-    it_should_behave_like "a basic type"
+    it_should_behave_like "a structure"
+    it_should_behave_like "a packable type"
     it_should_behave_like "a groupable type"
   end
 
@@ -202,7 +203,8 @@ describe Rstruct::Structure do
 
     end
 
-    it_should_behave_like "a basic type"
+    it_should_behave_like "a structure"
+    it_should_behave_like "a packable type"
     it_should_behave_like "a groupable type"
   end
 
@@ -225,7 +227,8 @@ describe Rstruct::Structure do
       @rawdat = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02"
     end
 
-    it_should_behave_like "a basic type"
+    it_should_behave_like "a structure"
+    it_should_behave_like "a packable type"
     it_should_behave_like "a groupable type"
   end
 end

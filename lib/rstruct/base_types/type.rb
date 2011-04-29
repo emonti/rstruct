@@ -1,12 +1,12 @@
 module Rstruct
   class Type
-    attr_reader :name
+    attr_reader :name, :params
 
-    def initialize(name, opts={}, &block)
-      @opts = opts.dup
+    def initialize(name, params={}, &block)
+      @params = params.dup
       @name = name.to_sym
 
-      reg, aliases = opts.values_at(:register, :aliases)
+      reg, aliases = params.values_at(:register, :aliases)
       regnames = ((aliases)? ([aliases] << @name) : [@name]).uniq.compact
 
       reg=nil if reg==true

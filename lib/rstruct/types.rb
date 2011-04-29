@@ -7,8 +7,6 @@ module Rstruct
 
   Ubyte = PackedType.new(:ubyte, 1, "C", :alias => [:UBYTE, :unsigned_byte])
 
-  Pointer = PackedType.new(:pointer, [0].pack("L_").size , "L_", :alias => :pointer)
-
   Int = PackedType.new(:int, [0].pack("i_").size, "i_", :alias => [:int_t, :bool, :BOOL, :signed_int])
 
   Uint = PackedType.new(:uint, [0].pack("I_").size, "I_", :alias => [:uint_t, :unsigned_int])
@@ -40,4 +38,7 @@ module Rstruct
   Uint16be = PackedType.new(:uint16be, 2, "n", :alias => [:uint16_be, :ub16, :be16])
 
   Uint32be = PackedType.new(:uint32be, 4, "N", :alias => [:uint32_be, :ub32, :be32])
+
+  Pointer = PackedType.new(:pointer, [0].pack("L_").size , "L_", :alias => :pointer)
+
 end
