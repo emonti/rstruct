@@ -29,7 +29,7 @@ module Rstruct
 
     def instance(*vals)
       s = @mystruct.new(*vals).extend(ContainerMixins)
-      s.container_type = self
+      s.rstruct_type = self
       yield(s) if block_given?
       return s
     end
