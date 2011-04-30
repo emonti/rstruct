@@ -1,21 +1,51 @@
+require 'tempfile'
 require 'stringio'
 
 # Applies to types that can be packed.
 shared_examples_for "a packable type" do
   context "instances" do
-    it "should put data to a string correctly without an output" do
+    it "should write data and return a string when no output is specified" do
       @populate.call()
-      raw = @instance.put
-      raw.should == @rawdata
+      ret = @instance.write()
+      ret.should == @rawdata
     end
 
-    it "should put data to a string object correctly"
+    it "should write data to a string object correctly" do
+      s = "test"
+      @populate.call()
+      ret = @instance.write(s)
+      ret.should == @rawdata
+      s.should == "test" << @rawdata
+    end
 
-    it "should put data to a StringIO correctly"
+    it "should write data to a StringIO object correctly" do
+      sio = StringIO.new
+      @populate.call()
+      ret = @instance.write(sio)
+      ret.should == @rawdata
+      sio.string.should == @rawdata
+    end
 
-    it "should get values correctly from a string and return an instance"
+    it "should write data to a File IO object correctly" do
+      begin
+        tempf = Tempfile.new('rstruct_test_packing')
+        tempf.write("test")
+        @populate.call()
+        ret = @instance.write(tempf)
+        ret.should == @rawdata.size
+        tempf.rewind
+        tempf.read.should == "test" << @rawdata
+      ensure
+        tempf.close if tempf
+      end
+    end
 
-    it "should get values correctly from a StringIO object and return an instance"
+
+
+    it "should read data to a populated instance from a string" do
+    end
+
+    it "should read data to a populated instance from a StringIO object"
 
   end
 end
