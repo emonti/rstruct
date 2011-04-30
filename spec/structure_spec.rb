@@ -208,6 +208,16 @@ describe Rstruct::Structure do
     it_should_behave_like "a structure"
     it_should_behave_like "a packable type"
     it_should_behave_like "a groupable type"
+
+    it "should return the correct offset for fields" do
+      @struct.offset_of(:magic).should == 0
+      @struct.offset_of(:cputype).should == 4
+      @struct.offset_of(:cpusubtype).should == 8
+      @struct.offset_of(:filetype).should == 12
+      @struct.offset_of(:ncmds).should == 16
+      @struct.offset_of(:sizeofcmds).should == 20
+      @struct.offset_of(:flags).should == 24
+    end
   end
 
   context "a simple fixed-length nested struct" do

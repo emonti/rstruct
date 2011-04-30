@@ -39,7 +39,7 @@ module Rstruct
     end
 
     def sizeof
-      self.size
+      raise(NotImplementedError, "sizeof not implemented in #{self.class}")
     end
 
     private

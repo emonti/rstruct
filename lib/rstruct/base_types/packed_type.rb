@@ -61,10 +61,10 @@ module Rstruct
 
   class PackedType < Type
     include Packable
-    attr_reader :size, :format
+    attr_reader :sizeof, :format
 
     def initialize(name, size, format, opts={}, &block)
-      @size = size
+      @sizeof = size
       @format = format
       @groupable = true
       super(name, opts, &block)

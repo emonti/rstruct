@@ -51,9 +51,17 @@ module Rstruct
         # container and pass it along with values to each
         # field's claim_value method.
         self.fields.do {|f| s[f.name] = f.typ.claim_value(vals,s) }
-
         return s
       end
+    end
+
+    def offset_of(fld)
+      o = 0
+      self.fields.each do |f|
+        return o if f.name == fld
+        o += f.sizeof
+      end
+      raise(InvalidTypeError, "Invalid type: #{fld}")
     end
   end
 end
