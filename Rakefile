@@ -14,9 +14,9 @@ Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "rstruct"
   gem.homepage = "http://github.com/emonti/rstruct"
-  gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.license = "GPL"
+  gem.summary = %Q{A library for working with Ruby binary structures in a way similar to c-structs}
+  gem.description = %Q{A library for working with Ruby binary structures in a way similar to c-structs}
   gem.email = "esmonti@gmail.com"
   gem.authors = ["Eric Monti"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
