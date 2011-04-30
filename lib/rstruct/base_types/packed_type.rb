@@ -50,7 +50,8 @@ module Rstruct
           if @pack_cb
             @pack_cb.call(val, obj)
           else
-            (val.is_a?(Array)? val : [val]).pack(self.format)
+            varray = val.is_a?(Array) ? val : [val]
+            varray.pack(self.format)
           end
         rescue => e
           raise(PackError, "Error packing #{val.inspect} as type #{self.name.inspect} -- #{e.class} -> #{e}")
