@@ -12,29 +12,50 @@ The structure declaration syntax emulates C structures syntax, although Rstruct
 is not intended to be able to parse C structures from C header files. (howewver
 an addon could conceivably be built to do so with minimal fuss)
 
-Rstruct was written because the authors wanted something comparable to C
-structures without having a strong need for extra 'magic' in parsing or
-building structures. While there exist numerous options in this space, they
-all seem to have suffered from a combination of performance and interface issues
-which limit their potential (and in some cases, spotty maintenance). 
-
-That said, there are several other binary structure library options out there
-such as BinData, BitStruct, or Ruckus. Some of these support variable length
-structures which, at this time, Rstruct does not. If you are looking for
-something to parse variable length data automatically for you, you are probably
-better off looking at one of these alterntives. However, having tried pretty
-much all of these in previous projects, the author still decided to write
-rstruct.
-
 Multiple approaches to parsing and building are supported and more can be added
 with minimal fuss. For example, you might not wish to use the same interface to
 build or parse a structure on an IO object as you would a String object. In
 other words, it's nice to have something that can work easily with streamed IO
 as well as buffers.
 
-== Synopsis
+Rstruct was written because the authors wanted something comparable to C
+structures without having a strong need for extra 'magic' in parsing or
+building structures. While there exist numerous options in this space, they
+all seem to have suffered from a combination of performance and interface issues
+which limit their potential (and in some cases, spotty maintenance). Having, 
+tried pretty much all of these alternatives (and even contributed to a few) 
+in previous projects, the author still decided to write rstruct.
 
-  # A basic Rstruct example using Apple's FAT file structure.
+That said, the author does not claim Rstruct to be superior to any others, it's
+just another approach. There are several other excellent binary structure
+library options out there such as BinData, BitStruct, or Ruckus. Some of these
+support variable length structures which, at this time, Rstruct does not. If
+you are looking for something to parse variable length data automatically, you
+are may be better off checking out one of these alterntives. 
+
+== Synopsis
+Here is a trivial example defining and packing a raw structure
+
+  require 'rstruct'
+  extend Rstruct::ClassMethods
+
+  example = struct(:example) {
+    uint32 :a
+    uint32 :b
+    uint32 :c
+  }.instance
+
+  example.a = 0x41
+  example.b = 0x42
+  example.c = 0x43
+
+  raw = example.write()
+  # => "A\x00\x00\x00B\x00\x00\x00C\x00\x00\x00" # on a little endian machine
+  # => "\x00\x00\x00A\x00\x00\x00B\x00\x00\x00C" # on a big endian machine
+
+
+Here is a fully functional Rstruct parser example using Apple's FAT file structure.
+
   # To compare the structs to their C counterparts, see:
   #   http://fxr.watson.org/fxr/source/EXTERNAL_HEADERS/mach-o/fat.h?v=xnu-1228
 
@@ -82,6 +103,27 @@ as well as buffers.
     end
   end
   
+.. which should produce output something like the following:
+
+  FAT header:
+    magic = 0xcafebabe
+    nfat_arch = 0x00000002
+
+    Architecture 0:
+      cputype = 0x01000007
+      cpusubtype = 0x80000003
+      offset = 0x00001000
+      size = 0x00009ab0
+      align = 0x0000000c
+
+    Architecture 1:
+      cputype = 0x00000007
+      cpusubtype = 0x00000003
+      offset = 0x0000b000
+      size = 0x00008b30
+      align = 0x0000000c
+
+
 
 == Copyright
 
