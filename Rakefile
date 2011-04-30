@@ -45,6 +45,6 @@ Rake::RDocTask.new do |rdoc|
 
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "rstruct #{version}"
-  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('README*', 'TODO*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end

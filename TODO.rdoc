@@ -1,0 +1,8 @@
+== TODO
+
+* really no good reason why we can't support variable length data
+* add types for odd byte-alignment values like 24-bit, 12-bit, 48-bit, etc.
+* add a type for handling bitfields
+* add instance helpers for resolving enums forward and back
+
+
