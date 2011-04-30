@@ -235,11 +235,63 @@ describe Rstruct::Structure do
 
       @pack_format = "NNcc"
       @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02"
+
+      @verify_unpack = lambda do |ret|
+        @values.each {|k,v| ret.__send__(k).should == v }
+        inner_values.each {|k,v| ret.inner.__send__(k).should == v}
+      end
     end
 
     it_should_behave_like "a structure"
     it_should_behave_like "a packable type"
     it_should_behave_like "a groupable type"
   end
+
+  context "a doubly-nested fixed-length struct" do
+    before :each do
+      inner_inner_struct = Rstruct.struct(:double_nest_inner, :register => true) {
+        byte  :dbyte1
+        byte  :dbyte2
+      } unless Rstruct.default_registry[:double_nest_inner]
+
+      inner_struct = Rstruct.struct(:first_inner, :register => true) {
+        byte :byte1
+        byte :byte2
+        double_nest_inner :double_inner
+      } unless Rstruct.default_registry[:first_inner]
+
+      @struct = Rstruct::Structure.new(:double_nest_struct, :register => false) {
+        uint32be  :someint1
+        uint32be  :someint2
+        first_inner :inner
+      }
+
+      @values = { :someint1 => 0xdeadbeef, :someint2 => 0xfacefeeb }
+      inner_values = { :byte1 => 1, :byte2 => 2 }
+      double_inner_values = { :dbyte1 => 3, :dbyte2 => 4 }
+
+      @instance = @struct.instance
+
+      @populate = lambda do
+        @values.each {|k,v| @instance[k] = v }
+        inner_values.each {|k,v| @instance.inner[k] = v}
+        double_inner_values.each {|k,v| @instance.inner.double_inner[k] = v}
+      end
+
+      @pack_format = "NNcccc"
+      @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02\x03\x04"
+
+      @verify_unpack = lambda do |ret|
+        @values.each {|k,v| ret.__send__(k).should == v }
+        inner_values.each {|k,v| ret.inner.__send__(k).should == v}
+        double_inner_values.each {|k,v| ret.inner.double_inner.__send__(k).should == v}
+      end
+    end
+
+    it_should_behave_like "a structure"
+    it_should_behave_like "a packable type"
+    it_should_behave_like "a groupable type"
+  end
+
 end
 
