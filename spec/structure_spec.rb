@@ -250,8 +250,8 @@ describe Rstruct::Structure do
   context "a doubly-nested fixed-length struct" do
     before :each do
       inner_inner_struct = Rstruct.struct(:double_nest_inner, :register => true) {
-        byte  :dbyte1
-        byte  :dbyte2
+        char  :dchar1
+        char  :dchar2
       } unless Rstruct.default_registry[:double_nest_inner]
 
       inner_struct = Rstruct.struct(:first_inner, :register => true) {
@@ -268,7 +268,7 @@ describe Rstruct::Structure do
 
       @values = { :someint1 => 0xdeadbeef, :someint2 => 0xfacefeeb }
       inner_values = { :byte1 => 1, :byte2 => 2 }
-      double_inner_values = { :dbyte1 => 3, :dbyte2 => 4 }
+      double_inner_values = { :dchar1 => 'A', :dchar2 => 'B' }
 
       @instance = @struct.instance
 
@@ -278,8 +278,8 @@ describe Rstruct::Structure do
         double_inner_values.each {|k,v| @instance.inner.double_inner[k] = v}
       end
 
-      @pack_format = "NNcccc"
-      @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02\x03\x04"
+      @pack_format = "NNccAA"
+      @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02\x41\x42"
 
       @verify_unpack = lambda do |ret|
         @values.each {|k,v| ret.__send__(k).should == v }
