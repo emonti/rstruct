@@ -156,9 +156,11 @@ describe Rstruct::Structure do
 
       @values = { :someint1 => 0xdeadbeef, :someint2 => 0xfacefeeb }
 
-      @populate = lambda { @values.each { |k,v| @struct[k] = v } }
+      @instance = @struct.instance
+      @populate = lambda { @values.each { |k,v| @instance[k] = v } }
+
       @pack_format = "NN"
-      @rawdat = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb"
+      @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb"
     end
 
     it_should_behave_like "a structure"
@@ -191,15 +193,15 @@ describe Rstruct::Structure do
         :flags      => 0x00000085,
       }
 
+      @instance = @struct.instance
+      @populate = lambda { @values.each { |k,v| @instance[k] = v } }
+
       @pack_format = "VVVVVVV"
-
-      @populate = lambda { @values.each { |k,v| @struct[k] = v } }
-
-      @rawdat = @values.values_at(
+      @rawdata = @values.values_at(
         :magic, :cputype, :cpusubtype, :filetype, :ncmds, :sizeofcmds, :flags
       ).pack(@pack_format)
 
-      @rawdat.should == "\316\372\355\376\a\000\000\000\003\000\000\000\002\000\000\000\r\000\000\000\354\005\000\000\205\000\000\000"
+      @rawdata.should == "\316\372\355\376\a\000\000\000\003\000\000\000\002\000\000\000\r\000\000\000\354\005\000\000\205\000\000\000"
 
     end
 
@@ -222,9 +224,17 @@ describe Rstruct::Structure do
       }
 
       @values = { :someint1 => 0xdeadbeef, :someint2 => 0xfacefeeb }
+      inner_values = { :byte1 => 1, :byte2 => 2 }
+
+      @instance = @struct.instance
+
+      @populate = lambda do
+        @values.each {|k,v| @instance[k] = v }
+        inner_values.each {|k,v| @instance.inner[k] = v}
+      end
 
       @pack_format = "NNcc"
-      @rawdat = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02"
+      @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02"
     end
 
     it_should_behave_like "a structure"

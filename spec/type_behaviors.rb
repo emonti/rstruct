@@ -1,23 +1,27 @@
 require 'stringio'
 
+# Applies to types that can be packed.
 shared_examples_for "a packable type" do
-  it "should put data to a string correctly without an output" do
-  end
+  context "instances" do
+    it "should put data to a string correctly without an output" do
+      @populate.call()
+      raw = @instance.put
+      raw.should == @rawdata
+    end
 
-  it "should put data to a string object correctly" do
-  end
+    it "should put data to a string object correctly"
 
-  it "should put data to a StringIO correctly" do
-  end
+    it "should put data to a StringIO correctly"
 
-  it "should get values correctly from a string" do
-  end
+    it "should get values correctly from a string and return an instance"
 
-  it "should get values correctly from a StringIO object" do
-  end
+    it "should get values correctly from a StringIO object and return an instance"
 
+  end
 end
 
+# Applies to structs, arrays, or other types that encapsulate
+# more than one field.
 shared_examples_for "a groupable type" do
   it "should be groupable" do
     @struct.should be_groupable
@@ -28,7 +32,9 @@ shared_examples_for "a groupable type" do
   end
 end
 
+# Applies to structures
 shared_examples_for "a structure" do
+
   it "should return a value instance with a reference back to itself" do
     s = @struct.instance()
     s.rstruct_type.should == @struct
@@ -36,22 +42,19 @@ shared_examples_for "a structure" do
 
   context "struct instance" do
     it "should expose the same fields as the struct they belong to" do
-      s = @struct.instance()
-      @struct.field_names.each {|name| s.members.should include(name.to_s) }
+      @struct.field_names.each {|name| @instance.members.should include(name.to_s) }
     end
 
     it "should allow struct field values to be set and retrieved with accessors" do
-      s = @struct.instance()
       @values.each do |k,v| 
-        s.__send__(k).should be_nil
-        s.__send__("#{k}=", v).should == v
-        s.__send__(k).should == v
+        @instance.__send__(k).should be_nil
+        @instance.__send__("#{k}=", v).should == v
+        @instance.__send__(k).should == v
       end
     end
 
     it "should allow field values to be set with arguments to instance creation" do
-      vals = @values.values_at(*@struct.field_names)
-      s=@struct.instance(*vals)
+      s=@struct.instance(@values)
       s.rstruct_type.should == @struct
       @values.each { |k,v| s.__send__(k).should == v }
     end

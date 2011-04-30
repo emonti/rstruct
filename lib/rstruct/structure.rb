@@ -27,7 +27,13 @@ module Rstruct
       @mystruct = Struct.new(*self.field_names)
     end
 
-    def instance(*vals)
+    def instance(values=nil)
+      values ||= {}
+      vals = []
+      self.fields.each do |f|
+        v = values[f.name]
+        vals << (f.typ.respond_to?(:instance) ? f.typ.instance(v) : v)
+      end
       s = @mystruct.new(*vals).extend(ContainerMixins)
       s.rstruct_type = self
       yield(s) if block_given?
@@ -39,7 +45,7 @@ module Rstruct
         @claim_cb.call(vals, obj)
       else
         # create our struct container
-        s = @mystruct.new(self)
+        s = instance()
 
         # iterate through the fields assigning values in the
         # container and pass it along with values to each

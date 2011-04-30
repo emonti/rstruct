@@ -1,6 +1,42 @@
 require 'rstruct/base_types/type'
 
 module Rstruct
+
+  module ContainerMixins
+    def rstruct_type
+      @rstruct_type
+    end
+
+    def rstruct_type=(val)
+      if @rstruct_type
+        raise(ArgumentError, "Can't override the rstruct_type once it is set")
+      else
+        @rstruct_type = val
+      end
+    end
+
+    def put(dst=nil, pvals=nil)
+      dst ||= StringIO.new
+      typ ||= self.rstruct_type
+      vals = pvals || self.values
+
+      opos = dst.pos
+      typ.fields.each_with_index do |f, i|
+        fldval = vals.shift
+        if self.values[i].respond_to?(:put)
+          self.values[i].put(dst, fldval.values)
+        else
+          dst.write(f.typ.pack_value(fldval, self))
+        end
+      end
+      if dst.is_a?(StringIO) and pvals.nil?
+        return(dst.string)
+      else
+        return dst.pos - opos
+      end
+    end
+  end
+
   class ContainerType < Type
     include Packable
 
@@ -43,17 +79,4 @@ module Rstruct
 
   end
 
-  module ContainerMixins
-    def rstruct_type
-      @rstruct_type
-    end
-
-    def rstruct_type=(val)
-      if @rstruct_type
-        raise(ArgumentError, "Can't override the rstruct_type once it is set")
-      else
-        @rstruct_type = val
-      end
-    end
-  end
 end
