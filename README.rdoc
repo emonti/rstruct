@@ -124,6 +124,7 @@ Here is a fully functional Rstruct parser example using Apple's FAT file structu
       align = 0x0000000c
 
 
+Please refer to rdoc, the samples/ directory, and unit tests for more information.
 
 == Copyright
 
