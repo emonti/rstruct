@@ -58,6 +58,11 @@ module Rstruct
     def default_registry
       Registry::DEFAULT_REGISTRY
     end
+
+    def get_type(typ, reg=Registry::DEFAULT_REGISTRY)
+      reg[typ]
+    end
+
   end
 
   extend(ClassMethods)
