@@ -60,19 +60,24 @@ as well as buffers.
     uint32be       :align      # alignment as a power of 2
   }
 
+  # a basic helper to produce textual dumps of fields
   def dump(struct)
-    struct.each_pair.map {|k,v| "#{k} = 0x%0.8x" % v}
+    struct.each_pair.map {|k,v| "  #{k} = 0x%0.8x" % v}
   end
 
   File.open('ls.from_a_mac','r') do |f|
+    # Read and dump the FAT header from the file
     head = get_type(:fat_header).read(f)
     puts "FAT header:", dump(head)
     puts
 
-    arches = Array.new(head.nfat_arch) { get_type(:fat_arch).read(f) }
-    arches.each_with_index do |a,i|
+    # Read and dump the architectures after the header
+
+    fat_arch = get_type(:fat_arch)
+    (head.nfat_arch).times do |i|
+      arch = fat_arch.read(f) # note, it reads to a seperate object on each arch
       puts "  Architecture #{i}:"
-      puts "  " << dump(a).join("\n  ")
+      puts "  " << dump(arch).join("\n  ")
       puts
     end
   end
