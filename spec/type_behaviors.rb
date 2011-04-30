@@ -3,51 +3,6 @@ require 'stringio'
 
 # Applies to types that can be packed.
 shared_examples_for "a packable type" do
-  it "should read data from a String object and return a populated container instance" do
-    datcp = @rawdata.dup
-    ret = @struct.read(@rawdata)
-    if @verify_unpack
-      @verify_unpack.call(ret)
-    else
-      @values.each {|k,v| ret.__send__(k).should == v }
-    end
-    @rawdata.should == datcp
-  end
-
-  it "should read data from a StringIO object and return a populated container instance" do
-    sio = StringIO.new()
-    sio.write(@rawdata)
-    testend = "#{rand(9999)}testend"
-    sio.write(testend)
-    sio.rewind()
-    ret = @struct.read(sio)
-    if @verify_unpack
-      @verify_unpack.call(ret)
-    else
-      @values.each {|k,v| ret.__send__(k).should == v }
-    end
-    sio.read().should == testend
-  end
-
-  it "should read data from a File object and return a populated container instance" do
-    begin
-      fio = Tempfile.new('rstruct_test_unpacking')
-      fio.write(@rawdata)
-      testend = "#{rand(9999)}testend"
-      fio.write(testend)
-      fio.rewind()
-      ret = @struct.read(fio)
-      if @verify_unpack
-        @verify_unpack.call(ret)
-      else
-        @values.each {|k,v| ret.__send__(k).should == v }
-      end
-      fio.read().should == testend
-    ensure
-      fio.close if fio
-    end
-  end
-
   context "instances" do
     it "should write raw data and return a string when no output is specified" do
       @populate.call()
@@ -84,9 +39,68 @@ shared_examples_for "a packable type" do
         tempf.close if tempf
       end
     end
+  end
 
+  context "parsing" do
+    it "should read data from a String object and return a populated container instance" do
+      datcp = @rawdata.dup
+      ret = @struct.read(@rawdata)
+      if @verify_unpack
+        @verify_unpack.call(ret)
+      else
+        @values.each {|k,v| ret.__send__(k).should == v }
+      end
+      @rawdata.should == datcp # ensure the original string was not modified
+    end
+
+    it "should read data from a StringIO object and return a populated container instance" do
+      sio = StringIO.new()
+      sio.write(@rawdata)
+      testend = "#{rand(9999)}testend"
+      sio.write(testend)
+      sio.rewind()
+      ret = @struct.read(sio)
+      if @verify_unpack
+        @verify_unpack.call(ret)
+      else
+        @values.each {|k,v| ret.__send__(k).should == v }
+      end
+      sio.read().should == testend
+    end
+
+    it "should read data from a File object and return a populated container instance" do
+      begin
+        fio = Tempfile.new('rstruct_test_unpacking')
+        fio.write(@rawdata)
+        testend = "#{rand(9999)}testend"
+        fio.write(testend)
+        fio.rewind()
+        ret = @struct.read(fio)
+        if @verify_unpack
+          @verify_unpack.call(ret)
+        else
+          @values.each {|k,v| ret.__send__(k).should == v }
+        end
+        fio.read().should == testend
+      ensure
+        fio.close if fio
+      end
+    end
+
+    it "should parse to an instance which can be rewritten correctly" do
+      datcp = @rawdata.dup
+      ret = @struct.read(@rawdata)
+      if @verify_unpack
+        @verify_unpack.call(ret)
+      else
+        @values.each {|k,v| ret.__send__(k).should == v }
+      end
+      repacked = ret.write()
+      repacked.should == @rawdata
+    end
 
   end
+
 end
 
 # Applies to structs, arrays, or other types that encapsulate
