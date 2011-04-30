@@ -6,8 +6,9 @@ module Rstruct
       @params = params.dup
       @name = name.to_sym
 
-      reg, aliases = params.values_at(:register, :aliases)
-      regnames = ((aliases)? ([aliases] << @name) : [@name]).uniq.compact
+      reg = @params.delete(:register)
+      aliases = @params.delete(:alias)
+      regnames = ((aliases)? ([aliases] << @name).flatten : [@name]).uniq.compact
 
       reg=nil if reg==true
       register(regnames, reg) unless reg == false
