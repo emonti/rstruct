@@ -7,23 +7,23 @@ shared_examples_for "a packable type" do
     it "should write raw data and return a string when no output is specified" do
       @populate.call()
       ret = @instance.write()
-      ret.should == @rawdata
+      ret.bytes.to_a.should == @rawdata.bytes.to_a
     end
 
     it "should write raw data to a string object correctly" do
       s = "test"
       @populate.call()
       ret = @instance.write(s)
-      ret.should == @rawdata
-      s.should == "test" << @rawdata
+      ret.bytes.to_a.should == @rawdata.bytes.to_a
+      s.bytes.to_a.should == "test#{@rawdata}".bytes.to_a
     end
 
     it "should write raw data to a StringIO object correctly" do
       sio = StringIO.new
       @populate.call()
       ret = @instance.write(sio)
-      ret.should == @rawdata
-      sio.string.should == @rawdata
+      ret.bytes.to_a.should == @rawdata.bytes.to_a
+      sio.string.bytes.to_a.should == @rawdata.bytes.to_a
     end
 
     it "should write raw data to a File IO object correctly" do
@@ -34,7 +34,7 @@ shared_examples_for "a packable type" do
         ret = @instance.write(tempf)
         ret.should == @rawdata.size
         tempf.rewind
-        tempf.read.should == "test" << @rawdata
+        tempf.read.bytes.to_a.should == "test#{@rawdata}".bytes.to_a
       ensure
         tempf.close if tempf
       end
@@ -81,7 +81,7 @@ shared_examples_for "a packable type" do
         else
           @values.each {|k,v| ret.__send__(k).should == v }
         end
-        fio.read().should == testend
+        fio.read().bytes.to_a.should == testend.bytes.to_a
       ensure
         fio.close if fio
       end
@@ -96,7 +96,7 @@ shared_examples_for "a packable type" do
         @values.each {|k,v| ret.__send__(k).should == v }
       end
       repacked = ret.write()
-      repacked.should == @rawdata
+      repacked.bytes.to_a.should == @rawdata.bytes.to_a
     end
 
   end
@@ -125,7 +125,10 @@ shared_examples_for "a structure" do
 
   context "struct instance" do
     it "should expose the same fields as the struct they belong to" do
-      @struct.field_names.each {|name| @instance.members.should include(name.to_s) }
+      @struct.field_names.each do |name| 
+        name = name.to_s if RUBY_VERSION < '1.9'
+        @instance.members.should include(name)
+      end
     end
 
     it "should allow struct field values to be set and retrieved with accessors" do
