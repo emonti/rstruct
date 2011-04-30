@@ -4,6 +4,9 @@ module Rstruct
   class PackError < StandardError
   end
 
+  class ReadError < StandardError
+  end
+
   module Packable
     private
       # sets up a callback for packing a value to raw data
@@ -22,12 +25,21 @@ module Rstruct
       # Called when parsing. While you can override this in subclasses,
       # in general it is probably better to use the 'on_unpack' method
       # to define a proc to handle unpacking for special cases.
-      def unpack_raw(raw, obj=nil)
-        if @unpack_cb
-          @unpack_cb.call(raw, obj)
-        else
-          raw.unpack(self.format)
+      def unpack_raw(raw, predecessors=nil)
+        if raw.respond_to?(:read)
+          raw = raw.read(self.sizeof())
         end
+        if raw.size < self.sizeof()
+          raise(ReadError, "Expected #{self.sizeof} bytes, but only got #{raw.size} bytes")
+        end
+
+        vals = 
+          if @unpack_cb
+            @unpack_cb.call(raw, predecessors)
+          else
+            raw.unpack(self.format)
+          end
+        return(self.claim_value(vals, predecessors))
       end
 
       # Called when composing raw data. While you can override this in

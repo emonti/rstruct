@@ -29,9 +29,9 @@ module Rstruct
       @container or false
     end
 
-    def claim_value(vals, obj=nil)
+    def claim_value(vals, predecessors=nil)
       if @claim_cb
-        @claim_cb.call(vals, obj)
+        @claim_cb.call(vals, predecessors)
       else
         vals.shift
       end

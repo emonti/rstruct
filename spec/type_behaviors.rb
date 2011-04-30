@@ -3,14 +3,59 @@ require 'stringio'
 
 # Applies to types that can be packed.
 shared_examples_for "a packable type" do
+  it "should read data from a String object and return a populated container instance" do
+    datcp = @rawdata.dup
+    ret = @struct.read(@rawdata)
+    if @verify_unpack
+      @verify_unpack.call(ret)
+    else
+      @values.each {|k,v| ret.__send__(k).should == v }
+    end
+    @rawdata.should == datcp
+  end
+
+  it "should read data from a StringIO object and return a populated container instance" do
+    sio = StringIO.new()
+    sio.write(@rawdata)
+    testend = "#{rand(9999)}testend"
+    sio.write(testend)
+    sio.rewind()
+    ret = @struct.read(sio)
+    if @verify_unpack
+      @verify_unpack.call(ret)
+    else
+      @values.each {|k,v| ret.__send__(k).should == v }
+    end
+    sio.read().should == testend
+  end
+
+  it "should read data from a File object and return a populated container instance" do
+    begin
+      fio = Tempfile.new('rstruct_test_unpacking')
+      fio.write(@rawdata)
+      testend = "#{rand(9999)}testend"
+      fio.write(testend)
+      fio.rewind()
+      ret = @struct.read(fio)
+      if @verify_unpack
+        @verify_unpack.call(ret)
+      else
+        @values.each {|k,v| ret.__send__(k).should == v }
+      end
+      fio.read().should == testend
+    ensure
+      fio.close if fio
+    end
+  end
+
   context "instances" do
-    it "should write data and return a string when no output is specified" do
+    it "should write raw data and return a string when no output is specified" do
       @populate.call()
       ret = @instance.write()
       ret.should == @rawdata
     end
 
-    it "should write data to a string object correctly" do
+    it "should write raw data to a string object correctly" do
       s = "test"
       @populate.call()
       ret = @instance.write(s)
@@ -18,7 +63,7 @@ shared_examples_for "a packable type" do
       s.should == "test" << @rawdata
     end
 
-    it "should write data to a StringIO object correctly" do
+    it "should write raw data to a StringIO object correctly" do
       sio = StringIO.new
       @populate.call()
       ret = @instance.write(sio)
@@ -26,7 +71,7 @@ shared_examples_for "a packable type" do
       sio.string.should == @rawdata
     end
 
-    it "should write data to a File IO object correctly" do
+    it "should write raw data to a File IO object correctly" do
       begin
         tempf = Tempfile.new('rstruct_test_packing')
         tempf.write("test")
@@ -40,12 +85,6 @@ shared_examples_for "a packable type" do
       end
     end
 
-
-
-    it "should read data to a populated instance from a string" do
-    end
-
-    it "should read data to a populated instance from a StringIO object"
 
   end
 end

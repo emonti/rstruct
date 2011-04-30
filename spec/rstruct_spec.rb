@@ -65,7 +65,7 @@ describe Rstruct do
       }
       s.should be_a(Rstruct::Structure)
       s.name.should == :rspec_struct_test
-      s.size.should == 8
+      s.sizeof.should == 8
       s.fields.should be_an(Array)
       s.field_names.should == [:someint1, :someint2]
 

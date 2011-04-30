@@ -18,7 +18,7 @@ describe Rstruct::Structure do
         int32   :someint2
       }
       s.should be_a(Rstruct::Structure)
-      s.size.should == 8
+      s.sizeof.should == 8
       s.fields.should be_an(Array)
       s.field_names.should == [:someint1, :someint2]
       s.field_types.should == [Rstruct::Int32, Rstruct::Int32]

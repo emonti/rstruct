@@ -15,22 +15,33 @@ module Rstruct
       end
     end
 
-    def put(dst=nil, pvals=nil)
-      dst ||= StringIO.new
+    def write(dst=nil, pvals=nil)
+      if dst.is_a?(String)
+        l = dst.size
+        dst = StringIO.new(dst)
+        dst.pos = l
+      elsif dst.nil?
+        dst = StringIO.new
+      end
+
       typ ||= self.rstruct_type
-      vals = pvals || self.values
+
+
+      vals = (pvals.respond_to?(:values) ? pvals.values : pvals)
+      vals ||= self.values
 
       opos = dst.pos
       typ.fields.each_with_index do |f, i|
-        fldval = vals.shift
-        if self.values[i].respond_to?(:put)
-          self.values[i].put(dst, fldval.values)
+        fldval = vals[i]
+        if fldval.respond_to?(:write)
+          fldval.write(dst, fldval)
         else
           dst.write(f.typ.pack_value(fldval, self))
         end
       end
       if dst.is_a?(StringIO) and pvals.nil?
-        return(dst.string)
+        dst.pos = opos
+        return(dst.read)
       else
         return dst.pos - opos
       end
@@ -59,9 +70,9 @@ module Rstruct
       end.join
     end
 
-    def size
+    def sizeof
       self.fields.inject(0) do |s,v| 
-        if vs=v.size
+        if vs=v.typ.sizeof
           s+=vs
         else
           return nil
@@ -77,6 +88,19 @@ module Rstruct
       @field_types ||= self.fields.map{|f| f.typ }
     end
 
+    def read(raw)
+      raw = StringIO.new(raw) if raw.is_a?(String)
+      obj = self.instance()
+      fields.each do |f|
+        obj[f.name] = 
+          if f.respond_to?(:read)
+            f.read(raw)
+          else
+            f.unpack_raw(raw, obj)
+          end
+      end
+      return obj
+    end
   end
 
 end
