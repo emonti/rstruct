@@ -33,6 +33,10 @@ support variable length structures which, at this time, Rstruct does not. If
 you are looking for something to parse variable length data automatically, you
 are may be better off checking out one of these alterntives. 
 
+== Installation
+
+  (sudo)? gem install rstruct
+
 == Synopsis
 Here is a trivial example defining and packing a raw structure
 
