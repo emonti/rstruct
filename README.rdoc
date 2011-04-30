@@ -1,15 +1,16 @@
 = rstruct
 
 Rstruct is yet another ruby binary struct parser/builder framework based around
-a declarative syntax. Rstruct is designed with simplicity in mind with a slight
-focus on performance. 
+a declarative syntax. Rstruct is designed with simplicity in mind and with a
+a slightly less active focus on performance. 
+
+The goal of Rstruct is is to provide a system that lets you define structures
+once, and use them in many ways as you see fit. Kind-of like... C structs in
+system/API header files.
 
 The structure declaration syntax emulates C structures syntax, although Rstruct
 is not intended to be able to parse C structures from C header files. (howewver
 an addon could conceivably be built to do so with minimal fuss)
-
-There are several other binary structure library options out there such as
-BinData, BitStruct, or Ruckus.
 
 Rstruct was written because the authors wanted something comparable to C
 structures without having a strong need for extra 'magic' in parsing or
@@ -17,23 +18,65 @@ building structures. While there exist numerous options in this space, they
 all seem to have suffered from a combination of performance and interface issues
 which limit their potential (and in some cases, spotty maintenance). 
 
-The design of Rstruct is loosely based on the python library Construct.
-Notions of structure definition, parsing, and building are all kept seperate
-from eachother in order to keep the interface simplified. 
+That said, there are several other binary structure library options out there
+such as BinData, BitStruct, or Ruckus. Some of these support variable length
+structures which, at this time, Rstruct does not. If you are looking for
+something to parse variable length data automatically for you, you are probably
+better off looking at one of these alterntives. However, having tried pretty
+much all of these in previous projects, the author still decided to write
+rstruct.
 
-Furthermore, multiple approaches to parsing and building are supported and
-more can be added with minimal fuss. For example, you might not wish to use
-the same interface to build or parse a structure on an IO object as you would
-a String object. In other words, it's nice to have something that can work
-easily with streamed IO as well as buffers.
+Multiple approaches to parsing and building are supported and more can be added
+with minimal fuss. For example, you might not wish to use the same interface to
+build or parse a structure on an IO object as you would a String object. In
+other words, it's nice to have something that can work easily with streamed IO
+as well as buffers.
 
-Rstruct is designed to allow you more than one option when dealing with input
-and output of structures so as not to force your code into awkward convolutions
-to get things working. 
+== Synopsis
 
-The goal is to have a system that lets you define structures once, and use them
-in many ways as you see fit. Kinda like... C structs in system/API header files.
+  # A basic Rstruct example using Apple's FAT file structure.
+  # To compare the structs to their C counterparts, see:
+  #   http://fxr.watson.org/fxr/source/EXTERNAL_HEADERS/mach-o/fat.h?v=xnu-1228
 
+  require 'rstruct'
+  extend Rstruct::ClassMethods
+
+  FAT_MAGIC = 0xcafebabe
+  FAT_CIGAM = 0xbebafeca
+  
+  struct(:fat_header) {
+    uint32be  :magic;      # FAT_MAGIC
+    uint32be  :nfat_arch;  # number of structs that follow
+  }
+
+  typedef :uint32be, :cpu_type_t
+  typedef :uint32be, :cpu_subtype_t
+
+  struct(:fat_arch) {
+    cpu_type_t     :cputype    # cpu specifier (int)
+    cpu_subtype_t  :cpusubtype # machine specifier (int)
+    uint32be       :offset     # file offset to this object file
+    uint32be       :size       # size of this object file
+    uint32be       :align      # alignment as a power of 2
+  }
+
+  def dump(struct)
+    struct.each_pair.map {|k,v| "#{k} = 0x%0.8x" % v}
+  end
+
+  File.open('ls.from_a_mac','r') do |f|
+    head = get_type(:fat_header).read(f)
+    puts "FAT header:", dump(head)
+    puts
+
+    arches = Array.new(head.nfat_arch) { get_type(:fat_arch).read(f) }
+    arches.each_with_index do |a,i|
+      puts "  Architecture #{i}:"
+      puts "  " << dump(a).join("\n  ")
+      puts
+    end
+  end
+  
 
 == Copyright
 
