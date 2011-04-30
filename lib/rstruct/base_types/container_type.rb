@@ -88,19 +88,15 @@ module Rstruct
       @field_types ||= self.fields.map{|f| f.typ }
     end
 
-    def read(raw)
+    def read(raw, obj=nil)
       raw = StringIO.new(raw) if raw.is_a?(String)
       obj = self.instance()
       fields.each do |f|
-        obj[f.name] = 
-          if f.respond_to?(:read)
-            f.read(raw)
-          else
-            f.unpack_raw(raw, obj)
-          end
+        obj[f.name] = f.read(raw, obj)
       end
       return obj
     end
+
   end
 
 end

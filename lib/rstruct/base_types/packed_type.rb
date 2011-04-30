@@ -25,7 +25,7 @@ module Rstruct
       # Called when parsing. While you can override this in subclasses,
       # in general it is probably better to use the 'on_unpack' method
       # to define a proc to handle unpacking for special cases.
-      def unpack_raw(raw, predecessors=nil)
+      def read(raw, predecessors=nil)
         if raw.respond_to?(:read)
           raw = raw.read(self.sizeof())
         end
