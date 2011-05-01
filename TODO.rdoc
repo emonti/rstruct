@@ -1,7 +1,6 @@
 == TODO
 
 * DOCUMENTATION!
-* add a type for arrays
 * add a type for unions
 * really no good reason why we can't support variable length data
 * add types for odd byte-alignment values like 24-bit, 12-bit, 48-bit, etc.
