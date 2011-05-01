@@ -8,7 +8,7 @@ describe Rstruct::ArrayType do
         array :test_array, :char, 8
       }
       
-      @pack_format = "AAAAAAAA"
+      @pack_format = "aaaaaaaa"
 
       @instance = @struct.instance
 

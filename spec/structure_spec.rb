@@ -332,7 +332,7 @@ describe Rstruct::Structure do
         double_inner_values.each {|k,v| @instance.inner.double_inner[k] = v}
       end
 
-      @pack_format = "NNccAA"
+      @pack_format = "NNccaa"
       @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02\x41\x42"
 
       @verify_unpack = lambda do |ret|

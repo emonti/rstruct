@@ -1,7 +1,7 @@
 require 'rstruct/base_types'
 
 module Rstruct
-  Char = PackedType.new(:char, 1, "A", :alias => [:char, :char_t])
+  Char = PackedType.new(:char, 1, "a", :alias => [:char, :char_t])
 
   Byte = PackedType.new(:byte, 1, "c", :alias => [:BYTE, :signed_byte])
 
