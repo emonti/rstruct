@@ -11,8 +11,9 @@ module Rstruct
     attr_reader :count
 
     def initialize(name, typ, count, opts={}, &block)
-      lkupreg = (opts[:fields_from] || opts[:register] || Rstruct.default_registry)
-      super(name, opts, &block)
+      opts = opts.dup
+      lkupreg = (opts.delete(:fields_from) || opts.delete(:register) || Rstruct.default_registry)
+      super(name, opts.merge(:register => false), &block)
       @count = count
       unless @rtype = lkupreg[typ]
         raise(InvalidTypeError, "invalid array type #{typ.inspect}")
