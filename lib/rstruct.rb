@@ -41,7 +41,7 @@ module Rstruct
     end
 
     def typedef(p, t, opts={})
-      reg = opts[:registry] || default_registry
+      reg = opts[:register] || default_registry
       reg.typedef(p,t,opts)
     end
 
