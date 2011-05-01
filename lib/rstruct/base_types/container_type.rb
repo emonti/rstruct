@@ -36,7 +36,7 @@ module Rstruct
         if fldval.respond_to?(:write)
           fldval.write(dst, fldval)
         else
-          dst.write(f.typ.pack_value(fldval, self))
+          dst.write(f.typ.pack_value((fldval || 0), self))
         end
       end
       if dst.is_a?(StringIO) and pvals.nil?
@@ -81,22 +81,36 @@ module Rstruct
     end
 
     def field_names
-      @field_names ||= self.fields.map{|f| f.name }
+      self.fields.map{|f| f.name }
     end
 
     def field_types 
-      @field_types ||= self.fields.map{|f| f.typ }
+      self.fields.map{|f| f.typ }
     end
 
     def read(raw, obj=nil)
       raw = StringIO.new(raw) if raw.is_a?(String)
       obj = self.instance()
       fields.each do |f|
-        obj[f.name] = f.read(raw, obj)
+        obj[f.name] = f.typ.read(raw, obj)
       end
       return obj
     end
 
+    def claim_value(vals, obj=nil)
+      if @claim_cb
+        @claim_cb.call(vals, obj)
+      else
+        # create our struct container
+        s = instance()
+
+        # iterate through the fields assigning values in the
+        # container and pass it along with values to each
+        # field's claim_value method.
+        self.fields.do {|f| s[f.name] = f.typ.claim_value(vals,s) }
+        return s
+      end
+    end
   end
 
 end

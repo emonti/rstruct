@@ -1,5 +1,6 @@
 require 'rstruct/registry'
 require 'rstruct/field'
+require 'rstruct/base_types/array_type'
 
 module Rstruct
 
@@ -13,7 +14,11 @@ module Rstruct
     end
 
     def field(name, typ, typ_name, *args, &block)
-      @__fields << Field.new(name,typ,typ_name,args,block)
+      @__fields << Field.new(name,typ,args,block)
+    end
+
+    def array(name, typ, count, opts={}, &block)
+      @__fields << ArrayType.new(name, typ, count, opts, &block)
     end
 
     def method_missing(typ_arg, *args, &block)

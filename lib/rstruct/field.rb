@@ -1,11 +1,10 @@
 module Rstruct
   class Field
-    attr_reader :name, :typ_name, :typ, :args, :block
+    attr_reader :name, :typ, :args, :block
 
-    def initialize(name, typ, typ_name, args, block)
+    def initialize(name, typ, args, block)
       @name=name
       @typ=typ
-      @typ_name = typ_name || typ
       @args=args
       @block=block
     end

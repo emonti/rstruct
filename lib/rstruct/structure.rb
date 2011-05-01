@@ -1,6 +1,7 @@
 require 'rstruct/base_types'
 require 'rstruct/struct_builder'
 require 'rstruct/registry'
+require 'rstruct/base_types/array_type'
 
 module Rstruct
   class StructError < StandardError
@@ -38,21 +39,6 @@ module Rstruct
       s.rstruct_type = self
       yield(s) if block_given?
       return s
-    end
-
-    def claim_value(vals, obj=nil)
-      if @claim_cb
-        @claim_cb.call(vals, obj)
-      else
-        # create our struct container
-        s = instance()
-
-        # iterate through the fields assigning values in the
-        # container and pass it along with values to each
-        # field's claim_value method.
-        self.fields.do {|f| s[f.name] = f.typ.claim_value(vals,s) }
-        return s
-      end
     end
 
     def offset_of(fld)
