@@ -30,7 +30,7 @@ module Rstruct
       vals = (pvals.respond_to?(:values) ? pvals.values : pvals)
       vals ||= self.values
 
-      opos = dst.pos
+      opos = dst.pos if dst.respond_to?(:pos)
       typ.fields.each_with_index do |f, i|
         fldval = vals[i]
         if fldval.respond_to?(:write)
@@ -42,7 +42,7 @@ module Rstruct
       if dst.is_a?(StringIO) and pvals.nil?
         dst.pos = opos
         return(dst.read)
-      else
+      elsif opos and dst.respond_to?(:pos)
         return dst.pos - opos
       end
     end
