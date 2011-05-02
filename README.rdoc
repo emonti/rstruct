@@ -21,10 +21,10 @@ as well as buffers.
 Rstruct was written because the authors wanted something comparable to C
 structures without having a strong need for extra 'magic' in parsing or
 building structures. While there exist numerous options in this space, they
-all seem to have suffered from a combination of performance and interface issues
-which limit their potential (and in some cases, spotty maintenance). Having, 
-tried pretty much all of these alternatives (and even contributed to a few) 
-in previous projects, the author still decided to write rstruct.
+all seem to have suffered from a combination of performance and interface 
+issues which limit their potential (and in some cases, spotty maintenance). 
+Having, tried pretty much all of these alternatives (and even contributed to a
+few) in previous projects, the author still decided to write rstruct.
 
 That said, the author does not claim Rstruct to be superior to any others, it's
 just another approach. There are several other excellent binary structure
@@ -58,7 +58,8 @@ Here is a trivial example defining and packing a raw structure
   # => "\x00\x00\x00A\x00\x00\x00B\x00\x00\x00C" # on a big endian machine
 
 
-Here is a fully functional Rstruct parser example using Apple's FAT file structure.
+Here is a fully functional Rstruct parser example using Apple's FAT file
+structure.
 
   # To compare the structs to their C counterparts, see:
   #   http://fxr.watson.org/fxr/source/EXTERNAL_HEADERS/mach-o/fat.h?v=xnu-1228
@@ -100,7 +101,7 @@ Here is a fully functional Rstruct parser example using Apple's FAT file structu
 
     fat_arch = get_type(:fat_arch)
     (head.nfat_arch).times do |i|
-      arch = fat_arch.read(f) # note, it reads to a seperate object on each arch
+      arch = fat_arch.read(f) # note, it reads to a new object on each arch
       puts "  Architecture #{i}:"
       puts "  " << dump(arch).join("\n  ")
       puts
@@ -128,7 +129,8 @@ Here is a fully functional Rstruct parser example using Apple's FAT file structu
       align = 0x0000000c
 
 
-Please refer to rdoc, the samples/ directory, and unit tests for more information.
+Please refer to rdoc, the samples/ directory, and unit tests for more
+information.
 
 == Copyright
 
