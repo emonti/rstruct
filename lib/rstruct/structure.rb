@@ -1,7 +1,6 @@
 require 'rstruct/base_types'
 require 'rstruct/struct_builder'
 require 'rstruct/registry'
-require 'rstruct/base_types/array_type'
 
 module Rstruct
   class StructError < StandardError
