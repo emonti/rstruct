@@ -9,7 +9,7 @@ once, and use them in many ways as you see fit. Kind-of like... C structs in
 system/API header files.
 
 The structure declaration syntax emulates C structures syntax, although Rstruct
-is not intended to be able to parse C structures from C header files. (howewver
+is not intended to be able to parse C structures from C header files. (however
 an addon could conceivably be built to do so with minimal fuss)
 
 Multiple approaches to parsing and building are supported and more can be added
