@@ -9,6 +9,7 @@ require 'rstruct'
 extend Rstruct::ClassMethods
 
 FAT_MAGIC = 0xcafebabe
+FAT_CIGAM = 0xbebafeca
 
 fat_header = struct(:fat_header) {
   uint32be  :magic;      # FAT_MAGIC
@@ -49,7 +50,7 @@ ARGV.each do |fname|
 
     # Read and dump the FAT header from the file
     head = fat_header.read(f)
-    unless head.magic == FAT_MAGIC
+    unless [FAT_MAGIC, FAT_CIGAM].include?(head.magic)
       STDERR.puts "Error: #{fname} does not look like a FAT binary"
       next
     end
