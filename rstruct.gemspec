@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = "rstruct"
-  s.version = "0.1.3"
+  s.version = "0.1.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Eric Monti"]
@@ -10,6 +10,9 @@ Gem::Specification.new do |s|
   s.description = "A library for working with Ruby binary structures in a way similar to c-structs"
   s.email = "esmonti@gmail.com"
   s.homepage = "http://github.com/emonti/rstruct"
+
+  s.files         = `git ls-files`.split($/)
+
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.25"
