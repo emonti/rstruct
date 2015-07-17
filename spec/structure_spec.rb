@@ -204,7 +204,7 @@ describe Rstruct::Structure do
       @populate = lambda { @values.each { |k,v| @instance[k] = v } }
 
       @pack_format = "NN"
-      @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb"
+      @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb".force_encoding('binary')
     end
 
     it_should_behave_like "a structure"
@@ -243,9 +243,9 @@ describe Rstruct::Structure do
       @pack_format = "VVVVVVV"
       @rawdata = @values.values_at(
         :magic, :cputype, :cpusubtype, :filetype, :ncmds, :sizeofcmds, :flags
-      ).pack(@pack_format)
+      ).pack(@pack_format).force_encoding('binary')
 
-      @rawdata.should == "\316\372\355\376\a\000\000\000\003\000\000\000\002\000\000\000\r\000\000\000\354\005\000\000\205\000\000\000"
+      @rawdata.should == "\316\372\355\376\a\000\000\000\003\000\000\000\002\000\000\000\r\000\000\000\354\005\000\000\205\000\000\000".force_encoding('binary')
 
     end
 
@@ -288,7 +288,7 @@ describe Rstruct::Structure do
       end
 
       @pack_format = "NNcc"
-      @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02"
+      @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02".force_encoding('binary')
 
       @verify_unpack = lambda do |ret|
         @values.each {|k,v| ret.__send__(k).should == v }
@@ -333,7 +333,7 @@ describe Rstruct::Structure do
       end
 
       @pack_format = "NNccaa"
-      @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02\x41\x42"
+      @rawdata = "\xde\xad\xbe\xef\xfa\xce\xfe\xeb\x01\x02\x41\x42".force_encoding('binary')
 
       @verify_unpack = lambda do |ret|
         @values.each {|k,v| ret.__send__(k).should == v }

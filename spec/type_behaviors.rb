@@ -1,5 +1,6 @@
 require 'tempfile'
 require 'stringio'
+require 'pry'
 
 # Applies to types that can be packed.
 shared_examples_for "a packable type" do
@@ -32,7 +33,7 @@ shared_examples_for "a packable type" do
         tempf.write("test")
         @populate.call()
         ret = @instance.write(tempf)
-        ret.should == @rawdata.size
+        ret.should == @rawdata.bytesize
         tempf.rewind
         tempf.read.bytes.to_a.should == "test#{@rawdata}".bytes.to_a
       ensure
